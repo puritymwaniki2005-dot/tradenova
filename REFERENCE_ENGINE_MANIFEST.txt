@@ -1,0 +1,301 @@
+src/reference-bot-engine/constants/config.ts
+src/reference-bot-engine/constants/index.ts
+src/reference-bot-engine/constants/messages.ts
+src/reference-bot-engine/constants/save-type.ts
+src/reference-bot-engine/examples/cli-examples/speed-test.js
+src/reference-bot-engine/examples/xml-examples/misc/Alternate Even-Odd.xml
+src/reference-bot-engine/examples/xml-examples/misc/Get previous tick candle or RSI.xml
+src/reference-bot-engine/examples/xml-examples/misc/Get the last digit after purchase.xml
+src/reference-bot-engine/examples/xml-examples/misc/Great Martingale.xml
+src/reference-bot-engine/examples/xml-examples/misc/alternate call put on loss.xml
+src/reference-bot-engine/examples/xml-examples/misc/buy_on_desired_net_profit.xml
+src/reference-bot-engine/examples/xml-examples/misc/is candle new package.xml
+src/reference-bot-engine/examples/xml-examples/misc/macd_signal_range.xml
+src/reference-bot-engine/examples/xml-examples/misc/martingale_alternate_even_odd.xml
+src/reference-bot-engine/examples/xml-examples/misc/moving-average-example.xml
+src/reference-bot-engine/examples/xml-examples/misc/pause 10s after 3 runs.xml
+src/reference-bot-engine/examples/xml-examples/misc/rsi call put.xml
+src/reference-bot-engine/examples/xml-examples/misc/simple_three_line_strike.xml
+src/reference-bot-engine/examples/xml-examples/misc/sma_compare_threshold.xml
+src/reference-bot-engine/examples/xml-examples/misc/switch_barrier_sign.xml
+src/reference-bot-engine/examples/xml-examples/misc/wait 3 mins after 3 loss.xml
+src/reference-bot-engine/examples/xml-examples/money-management/index.xml
+src/reference-bot-engine/examples/xml-examples/money-management/stop_loss.xml
+src/reference-bot-engine/examples/xml-examples/money-management/take_profit.xml
+src/reference-bot-engine/examples/xml-examples/money-management/take_profit_and_stop_loss.xml
+src/reference-bot-engine/examples/xml-examples/price-actions/three line strike.xml
+src/reference-bot-engine/examples/xml-examples/random/3 same candle colors.xml
+src/reference-bot-engine/examples/xml-examples/random/Candle Analysis Revised.xml
+src/reference-bot-engine/examples/xml-examples/random/Greate Martingale.xml
+src/reference-bot-engine/examples/xml-examples/random/Use last digit in trade definition.xml
+src/reference-bot-engine/examples/xml-examples/random/alternate 3 times then change order (1).xml
+src/reference-bot-engine/examples/xml-examples/random/alternate call put martingale.xml
+src/reference-bot-engine/examples/xml-examples/random/alternate call put on new candle.xml
+src/reference-bot-engine/examples/xml-examples/random/alternate-call-up-on-two-loss.xml
+src/reference-bot-engine/examples/xml-examples/random/dalembert_predefined_params.xml
+src/reference-bot-engine/examples/xml-examples/random/fixed package for carloscarraro.xml
+src/reference-bot-engine/examples/xml-examples/random/get last digit after purchase.xml
+src/reference-bot-engine/examples/xml-examples/random/green_or_red_on_new_candle.xml
+src/reference-bot-engine/examples/xml-examples/random/is stripes pattern.xml
+src/reference-bot-engine/examples/xml-examples/random/last digit demo.xml
+src/reference-bot-engine/examples/xml-examples/random/martingale_alternate_even_odd_with_timeout.xml
+src/reference-bot-engine/examples/xml-examples/random/prediction example.xml
+src/reference-bot-engine/examples/xml-examples/random/reset_martingale_after_5_loss.xml
+src/reference-bot-engine/examples/xml-examples/random/reset_martingale_after_5_trades.xml
+src/reference-bot-engine/examples/xml-examples/random/start martingale after 2 loss.xml
+src/reference-bot-engine/examples/xml-examples/random/static_stake_martingale.xml
+src/reference-bot-engine/examples/xml-examples/random/switch_contract_type_on_loss_with_martingale.xml
+src/reference-bot-engine/examples/xml-examples/random/two predictions.xml
+src/reference-bot-engine/examples/xml-examples/random/var_set_test.xml
+src/reference-bot-engine/examples/xml-examples/risk-management/dalembert.xml
+src/reference-bot-engine/examples/xml-examples/risk-management/martingale reset on expected.xml
+src/reference-bot-engine/examples/xml-examples/risk-management/martingale.xml
+src/reference-bot-engine/examples/xml-examples/risk-management/oscars_grind.xml
+src/reference-bot-engine/examples/xml-examples/tools/body_percentage.xml
+src/reference-bot-engine/examples/xml-examples/tools/index.xml
+src/reference-bot-engine/examples/xml-examples/tools/is candle new.xml
+src/reference-bot-engine/examples/xml-examples/tools/is stripes pattern.xml
+src/reference-bot-engine/examples/xml-examples/tools/is_downtrend.xml
+src/reference-bot-engine/examples/xml-examples/tools/is_uptrend.xml
+src/reference-bot-engine/examples/xml-examples/tools/lower_shadow_percentage.xml
+src/reference-bot-engine/examples/xml-examples/tools/test_suite.xml
+src/reference-bot-engine/examples/xml-examples/tools/upper_shadow_percentage.xml
+src/reference-bot-engine/images/create_variable.jpg
+src/reference-bot-engine/images/ic-chevron-down-bold.svg
+src/reference-bot-engine/images/is_candle_black.jpeg
+src/reference-bot-engine/images/is_candle_black_1.jpeg
+src/reference-bot-engine/images/logic.png
+src/reference-bot-engine/images/set_variable.png
+src/reference-bot-engine/images/sma_array_explanation.jpeg
+src/reference-bot-engine/images/sma_chart_1.png
+src/reference-bot-engine/images/sma_chart_2.png
+src/reference-bot-engine/images/sma_formula.png
+src/reference-bot-engine/index.js
+src/reference-bot-engine/scratch/accumulators-proposal-handler.js
+src/reference-bot-engine/scratch/backward-compatibility.js
+src/reference-bot-engine/scratch/blockly.js
+src/reference-bot-engine/scratch/blocks/Advanced/Functions/index.js
+src/reference-bot-engine/scratch/blocks/Advanced/Functions/procedures_callnoreturn.js
+src/reference-bot-engine/scratch/blocks/Advanced/Functions/procedures_callreturn.js
+src/reference-bot-engine/scratch/blocks/Advanced/Functions/procedures_defnoreturn.js
+src/reference-bot-engine/scratch/blocks/Advanced/Functions/procedures_defreturn.js
+src/reference-bot-engine/scratch/blocks/Advanced/Functions/procedures_ifreturn.js
+src/reference-bot-engine/scratch/blocks/Advanced/List/index.js
+src/reference-bot-engine/scratch/blocks/Advanced/List/lists_create_with.js
+src/reference-bot-engine/scratch/blocks/Advanced/List/lists_getIndex.js
+src/reference-bot-engine/scratch/blocks/Advanced/List/lists_getSublist.js
+src/reference-bot-engine/scratch/blocks/Advanced/List/lists_indexOf.js
+src/reference-bot-engine/scratch/blocks/Advanced/List/lists_isEmpty.js
+src/reference-bot-engine/scratch/blocks/Advanced/List/lists_length.js
+src/reference-bot-engine/scratch/blocks/Advanced/List/lists_repeat.js
+src/reference-bot-engine/scratch/blocks/Advanced/List/lists_setIndex.js
+src/reference-bot-engine/scratch/blocks/Advanced/List/lists_sort.js
+src/reference-bot-engine/scratch/blocks/Advanced/List/lists_split.js
+src/reference-bot-engine/scratch/blocks/Advanced/List/lists_statement.js
+src/reference-bot-engine/scratch/blocks/Advanced/Loops/controls_flow_statements.js
+src/reference-bot-engine/scratch/blocks/Advanced/Loops/controls_for.js
+src/reference-bot-engine/scratch/blocks/Advanced/Loops/controls_forEach.js
+src/reference-bot-engine/scratch/blocks/Advanced/Loops/controls_repeat.js
+src/reference-bot-engine/scratch/blocks/Advanced/Loops/controls_repeat_ext.js
+src/reference-bot-engine/scratch/blocks/Advanced/Loops/controls_whileUntil.js
+src/reference-bot-engine/scratch/blocks/Advanced/Loops/index.js
+src/reference-bot-engine/scratch/blocks/Advanced/Variable/index.js
+src/reference-bot-engine/scratch/blocks/Advanced/Variable/variables_get.js
+src/reference-bot-engine/scratch/blocks/Advanced/Variable/variables_set.js
+src/reference-bot-engine/scratch/blocks/Binary/After Purchase/after_purchase.js
+src/reference-bot-engine/scratch/blocks/Binary/After Purchase/check_result.js
+src/reference-bot-engine/scratch/blocks/Binary/After Purchase/index.js
+src/reference-bot-engine/scratch/blocks/Binary/After Purchase/read_details.js
+src/reference-bot-engine/scratch/blocks/Binary/After Purchase/trade_again.js
+src/reference-bot-engine/scratch/blocks/Binary/Before Purchase/ask_price.js
+src/reference-bot-engine/scratch/blocks/Binary/Before Purchase/before_purchase.js
+src/reference-bot-engine/scratch/blocks/Binary/Before Purchase/index.js
+src/reference-bot-engine/scratch/blocks/Binary/Before Purchase/payout.js
+src/reference-bot-engine/scratch/blocks/Binary/Before Purchase/purchase.js
+src/reference-bot-engine/scratch/blocks/Binary/During Purchase/check_sell.js
+src/reference-bot-engine/scratch/blocks/Binary/During Purchase/during_purchase.js
+src/reference-bot-engine/scratch/blocks/Binary/During Purchase/index.js
+src/reference-bot-engine/scratch/blocks/Binary/During Purchase/sell_at_market.js
+src/reference-bot-engine/scratch/blocks/Binary/During Purchase/sell_price.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/Parts/fast_ema_period.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/Parts/index.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/Parts/input_list.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/Parts/period.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/Parts/signal_ema_period.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/Parts/slow_ema_period.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/Parts/std_dev_multiplier_down.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/Parts/std_dev_multiplier_up.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/bb_statement.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/bba_statement.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/ema_statement.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/emaa_statement.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/index.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/macda_statement.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/rsi_statement.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/rsia_statement.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/sma_statement.js
+src/reference-bot-engine/scratch/blocks/Binary/Indicators/smaa_statement.js
+src/reference-bot-engine/scratch/blocks/Binary/Tick Analysis/check_direction.js
+src/reference-bot-engine/scratch/blocks/Binary/Tick Analysis/get_ohlc.js
+src/reference-bot-engine/scratch/blocks/Binary/Tick Analysis/index.js
+src/reference-bot-engine/scratch/blocks/Binary/Tick Analysis/lastDigitList.js
+src/reference-bot-engine/scratch/blocks/Binary/Tick Analysis/last_digit.js
+src/reference-bot-engine/scratch/blocks/Binary/Tick Analysis/ohlc.js
+src/reference-bot-engine/scratch/blocks/Binary/Tick Analysis/ohlc_values.js
+src/reference-bot-engine/scratch/blocks/Binary/Tick Analysis/readOhlc.js
+src/reference-bot-engine/scratch/blocks/Binary/Tick Analysis/stat.js
+src/reference-bot-engine/scratch/blocks/Binary/Tick Analysis/stat_list.js
+src/reference-bot-engine/scratch/blocks/Binary/Tick Analysis/tick.js
+src/reference-bot-engine/scratch/blocks/Binary/Tick Analysis/tick_analysis.js
+src/reference-bot-engine/scratch/blocks/Binary/Tick Analysis/ticks.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Candle/index.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Candle/is_candle_black.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Candle/ohlc_values_in_list.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Candle/read_ohlc_obj.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Misc/balance.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Misc/barrier_offset.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Misc/block_holder.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Misc/console.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Misc/index.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Misc/loader.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Misc/notify.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Misc/notify_telegram.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Misc/total_profit.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Misc/total_runs.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Misc/useless_block.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Time/epoch.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Time/index.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Time/tickdelay.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Time/timeout.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Time/todatetime.js
+src/reference-bot-engine/scratch/blocks/Binary/Tools/Time/totimestamp.js
+src/reference-bot-engine/scratch/blocks/Binary/Trade Definition/accumulator_take_profit.js
+src/reference-bot-engine/scratch/blocks/Binary/Trade Definition/index.js
+src/reference-bot-engine/scratch/blocks/Binary/Trade Definition/multiplier_stop_loss.js
+src/reference-bot-engine/scratch/blocks/Binary/Trade Definition/multiplier_take_profit.js
+src/reference-bot-engine/scratch/blocks/Binary/Trade Definition/trade_definition.js
+src/reference-bot-engine/scratch/blocks/Binary/Trade Definition/trade_definition_accumulator.js
+src/reference-bot-engine/scratch/blocks/Binary/Trade Definition/trade_definition_candleinterval.js
+src/reference-bot-engine/scratch/blocks/Binary/Trade Definition/trade_definition_contracttype.js
+src/reference-bot-engine/scratch/blocks/Binary/Trade Definition/trade_definition_market.js
+src/reference-bot-engine/scratch/blocks/Binary/Trade Definition/trade_definition_multiplier.js
+src/reference-bot-engine/scratch/blocks/Binary/Trade Definition/trade_definition_restartbuysell.js
+src/reference-bot-engine/scratch/blocks/Binary/Trade Definition/trade_definition_restartonerror.js
+src/reference-bot-engine/scratch/blocks/Binary/Trade Definition/trade_definition_tradeoptions.js
+src/reference-bot-engine/scratch/blocks/Binary/Trade Definition/trade_definition_tradetype.js
+src/reference-bot-engine/scratch/blocks/Logic/controls_if.js
+src/reference-bot-engine/scratch/blocks/Logic/index.js
+src/reference-bot-engine/scratch/blocks/Logic/logic_boolean.js
+src/reference-bot-engine/scratch/blocks/Logic/logic_compare.js
+src/reference-bot-engine/scratch/blocks/Logic/logic_negate.js
+src/reference-bot-engine/scratch/blocks/Logic/logic_null.js
+src/reference-bot-engine/scratch/blocks/Logic/logic_operation.js
+src/reference-bot-engine/scratch/blocks/Logic/logic_ternary.js
+src/reference-bot-engine/scratch/blocks/Math/index.js
+src/reference-bot-engine/scratch/blocks/Math/math_arithmetic.js
+src/reference-bot-engine/scratch/blocks/Math/math_change.js
+src/reference-bot-engine/scratch/blocks/Math/math_constant.js
+src/reference-bot-engine/scratch/blocks/Math/math_constrain.js
+src/reference-bot-engine/scratch/blocks/Math/math_modulo.js
+src/reference-bot-engine/scratch/blocks/Math/math_number.js
+src/reference-bot-engine/scratch/blocks/Math/math_number_positive.js
+src/reference-bot-engine/scratch/blocks/Math/math_number_property.js
+src/reference-bot-engine/scratch/blocks/Math/math_on_list.js
+src/reference-bot-engine/scratch/blocks/Math/math_random_float.js
+src/reference-bot-engine/scratch/blocks/Math/math_random_int.js
+src/reference-bot-engine/scratch/blocks/Math/math_round.js
+src/reference-bot-engine/scratch/blocks/Math/math_single.js
+src/reference-bot-engine/scratch/blocks/Math/math_trig.js
+src/reference-bot-engine/scratch/blocks/Text/index.js
+src/reference-bot-engine/scratch/blocks/Text/text.js
+src/reference-bot-engine/scratch/blocks/Text/text_append.js
+src/reference-bot-engine/scratch/blocks/Text/text_changeCase.js
+src/reference-bot-engine/scratch/blocks/Text/text_charAt.js
+src/reference-bot-engine/scratch/blocks/Text/text_getSubstring.js
+src/reference-bot-engine/scratch/blocks/Text/text_indexOf.js
+src/reference-bot-engine/scratch/blocks/Text/text_isEmpty.js
+src/reference-bot-engine/scratch/blocks/Text/text_join.js
+src/reference-bot-engine/scratch/blocks/Text/text_length.js
+src/reference-bot-engine/scratch/blocks/Text/text_print.js
+src/reference-bot-engine/scratch/blocks/Text/text_prompt_ext.js
+src/reference-bot-engine/scratch/blocks/Text/text_statement.js
+src/reference-bot-engine/scratch/blocks/Text/text_trim.js
+src/reference-bot-engine/scratch/blocks/images.js
+src/reference-bot-engine/scratch/blocks/index.js
+src/reference-bot-engine/scratch/dbot-store.js
+src/reference-bot-engine/scratch/dbot.js
+src/reference-bot-engine/scratch/goog.js
+src/reference-bot-engine/scratch/hooks/.eslintrc.js
+src/reference-bot-engine/scratch/hooks/block.js
+src/reference-bot-engine/scratch/hooks/block_svg.js
+src/reference-bot-engine/scratch/hooks/colours.js
+src/reference-bot-engine/scratch/hooks/constant.js
+src/reference-bot-engine/scratch/hooks/data_category.js
+src/reference-bot-engine/scratch/hooks/field.js
+src/reference-bot-engine/scratch/hooks/flyout_base.js
+src/reference-bot-engine/scratch/hooks/gesture.js
+src/reference-bot-engine/scratch/hooks/icon.js
+src/reference-bot-engine/scratch/hooks/index.js
+src/reference-bot-engine/scratch/hooks/procedures.js
+src/reference-bot-engine/scratch/hooks/scratch_block_comment.js
+src/reference-bot-engine/scratch/hooks/tooltip.js
+src/reference-bot-engine/scratch/hooks/trashcan.js
+src/reference-bot-engine/scratch/hooks/variable.js
+src/reference-bot-engine/scratch/hooks/workspace.js
+src/reference-bot-engine/scratch/hooks/workspace_svg.js
+src/reference-bot-engine/scratch/index.js
+src/reference-bot-engine/scratch/index.scss
+src/reference-bot-engine/scratch/options-proposal-handler.tsx
+src/reference-bot-engine/scratch/shared.js
+src/reference-bot-engine/scratch/utils/index.js
+src/reference-bot-engine/scratch/xml/main.xml
+src/reference-bot-engine/services/api/account-limits.js
+src/reference-bot-engine/services/api/active-symbols.js
+src/reference-bot-engine/services/api/api-base.ts
+src/reference-bot-engine/services/api/api-helpers.js
+src/reference-bot-engine/services/api/api-middleware.js
+src/reference-bot-engine/services/api/appId.js
+src/reference-bot-engine/services/api/chart-api.js
+src/reference-bot-engine/services/api/contracts-for.js
+src/reference-bot-engine/services/api/index.js
+src/reference-bot-engine/services/api/network_monitor.js
+src/reference-bot-engine/services/api/observables/connection-status-stream.ts
+src/reference-bot-engine/services/api/server_time.js
+src/reference-bot-engine/services/api/ticks_service.js
+src/reference-bot-engine/services/api/trading-times.js
+src/reference-bot-engine/services/tradeEngine/Interface/BotInterface.js
+src/reference-bot-engine/services/tradeEngine/Interface/CandleInterface.js
+src/reference-bot-engine/services/tradeEngine/Interface/IndicatorsInterface.js
+src/reference-bot-engine/services/tradeEngine/Interface/MiscInterface.js
+src/reference-bot-engine/services/tradeEngine/Interface/TicksInterface.js
+src/reference-bot-engine/services/tradeEngine/Interface/ToolsInterface.js
+src/reference-bot-engine/services/tradeEngine/Interface/index.js
+src/reference-bot-engine/services/tradeEngine/trade/Balance.js
+src/reference-bot-engine/services/tradeEngine/trade/OpenContract.js
+src/reference-bot-engine/services/tradeEngine/trade/Proposal.js
+src/reference-bot-engine/services/tradeEngine/trade/Purchase.js
+src/reference-bot-engine/services/tradeEngine/trade/Sell.js
+src/reference-bot-engine/services/tradeEngine/trade/Ticks.js
+src/reference-bot-engine/services/tradeEngine/trade/Total.js
+src/reference-bot-engine/services/tradeEngine/trade/index.js
+src/reference-bot-engine/services/tradeEngine/trade/state/actions/index.js
+src/reference-bot-engine/services/tradeEngine/trade/state/constants.js
+src/reference-bot-engine/services/tradeEngine/trade/state/reducers/index.js
+src/reference-bot-engine/services/tradeEngine/utils/broadcast.js
+src/reference-bot-engine/services/tradeEngine/utils/cliTools.js
+src/reference-bot-engine/services/tradeEngine/utils/helpers.js
+src/reference-bot-engine/services/tradeEngine/utils/interpreter.js
+src/reference-bot-engine/services/tradeEngine/utils/sanitize.js
+src/reference-bot-engine/utils/binary-utils.ts
+src/reference-bot-engine/utils/contract.js
+src/reference-bot-engine/utils/date-time-helper.js
+src/reference-bot-engine/utils/error-config.js
+src/reference-bot-engine/utils/error-handling.js
+src/reference-bot-engine/utils/error.js
+src/reference-bot-engine/utils/html-helper.js
+src/reference-bot-engine/utils/index.js
+src/reference-bot-engine/utils/local-storage.js
+src/reference-bot-engine/utils/observer.js
+src/reference-bot-engine/utils/pending-promise.js
+src/reference-bot-engine/utils/strategy-helper.js
+src/reference-bot-engine/utils/workspace.js
