@@ -109,6 +109,7 @@ export default function App() {
           const details = { loginid: a.loginid, currency: a.currency || 'USD', balance: Number(a.balance || 0), isDemo: /^VRTC|^VRT/i.test(a.loginid || '') };
           accountRef.current = details;
           setAccount(details);
+          try { send({ balance: 1, subscribe: 1 }); } catch (e) { addLog(`Balance subscription failed: ${e.message}`, 'warn'); }
           setLiveMode(!details.isDemo);
           addLog(`Authorized ${details.loginid} · ${details.isDemo ? 'DEMO' : 'REAL'} account.`, details.isDemo ? 'success' : 'warn');
           setNotice(details.isDemo ? 'Demo account authorized. Check your risk limits before starting the bot.' : 'Real-money account authorized. Bot remains stopped until you explicitly confirm live trading.');
@@ -120,7 +121,10 @@ export default function App() {
         }
         if (data.msg_type === 'tick' && data.tick) {
           const t = data.tick;
-          const point = { epoch: t.epoch, quote: Number(t.quote), digit: Number(String(t.quote).replace('.', '').slice(-1)), time: new Date(t.epoch * 1000).toLocaleTimeString([], { hour12: false }) };
+          const rawQuote = String(t.quote);
+          const precision = Number.isInteger(Number(t.pip_size)) ? Math.max(0, Math.min(10, Number(t.pip_size))) : ((rawQuote.split('.')[1] || '').length);
+          const quoteText = Number(t.quote).toFixed(precision);
+          const point = { epoch: t.epoch, quote: Number(t.quote), digit: Number(quoteText.replace('.', '').slice(-1)), time: new Date(t.epoch * 1000).toLocaleTimeString([], { hour12: false }) };
           const list = [...ticksRef.current, point].slice(-60);
           ticksRef.current = list;
           setTicks(list);
@@ -204,7 +208,9 @@ export default function App() {
   const startBot = () => {
     if (!account) { setNotice('Connect and authorize a Deriv demo account before starting.'); return; }
     if (!account.isDemo && !confirmLive) { setNotice('Real account detected. Tick “I understand this can place real-money trades” before starting.'); return; }
-    if (!Number(stake) || Number(stake) <= 0 || !Number(duration) || Number(duration) <= 0) { setNotice('Stake and duration must be positive numbers.'); return; }
+    if (!Number.isFinite(Number(stake)) || Number(stake) <= 0 || !Number.isFinite(Number(duration)) || Number(duration) <= 0) { setNotice('Stake and duration must be positive numbers.'); return; }
+    if (!Number.isInteger(Number(maxTrades)) || Number(maxTrades) < 1 || Number(maxTrades) > 100) { setNotice('Maximum trades must be a whole number from 1 to 100.'); return; }
+    if (!Number.isFinite(Number(takeProfit)) || Number(takeProfit) < 0 || !Number.isFinite(Number(stopLoss)) || Number(stopLoss) <= 0) { setNotice('Take profit must be zero or greater, and stop loss must be greater than zero.'); return; }
     botRef.current = { ...botRef.current, running: true, pending: false, count: 0, pnl: 0, lastQuote: quote, lastDigit: quote?.digit ?? null };
     setRunningPnl(0); setRunCount(0); setBotState('running'); setNotice('');
     addLog(`Bot started on ${SYMBOLS.find(s => s.value === symbol)?.label || symbol} · ${account.isDemo ? 'DEMO' : 'REAL'} · stake ${money(Number(stake), account.currency)}.`, 'success');
