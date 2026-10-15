@@ -1,1 +1,18 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>TradeNovaX</title></head><body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b1020" />
+    <title>TradeNovaX</title>
+    <script>
+      // Fallback for GitHub Pages accidentally publishing the repository root
+      // instead of the Vite build artifact. The normal Actions deployment serves
+      // the compiled app directly and never uses this source wrapper.
+      window.location.replace(new URL('./dist/', window.location.href).href);
+    </script>
+  </head>
+  <body>
+    <p>Opening TradeNovaX… If you are not redirected, <a href="./dist/">open the compiled app</a>.</p>
+  </body>
+</html>
