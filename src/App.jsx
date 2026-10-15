@@ -100,8 +100,14 @@ export default function App() {
           if (data.msg_type === 'authorize' || data.error.code === 'InvalidToken') {
             setAccount(null); accountRef.current = null; setNotice('Authorization failed. Check your token and API permissions.');
           }
-          botRef.current.pending = false;
-          if (data.msg_type === 'buy' || data.msg_type === 'proposal') botRef.current.pending = false;
+          if (data.msg_type === 'proposal' || data.msg_type === 'buy' || data.echo_req?.proposal || data.echo_req?.buy) {
+            botRef.current.pending = false;
+          }
+          if (data.msg_type === 'proposal_open_contract' || data.echo_req?.proposal_open_contract) {
+            botRef.current.running = false;
+            setBotState('stopped');
+            addLog('Contract updates failed. Bot stopped to avoid opening another trade while contract status is unknown.', 'error');
+          }
           return;
         }
         if (data.msg_type === 'authorize' && data.authorize) {
@@ -113,6 +119,10 @@ export default function App() {
           setLiveMode(!details.isDemo);
           addLog(`Authorized ${details.loginid} · ${details.isDemo ? 'DEMO' : 'REAL'} account.`, details.isDemo ? 'success' : 'warn');
           setNotice(details.isDemo ? 'Demo account authorized. Check your risk limits before starting the bot.' : 'Real-money account authorized. Bot remains stopped until you explicitly confirm live trading.');
+          if (botRef.current.openContract) {
+            try { send({ proposal_open_contract: 1, contract_id: botRef.current.openContract, subscribe: 1 }); }
+            catch (e) { addLog(`Could not restore contract monitoring: ${e.message}`, 'error'); }
+          }
         }
         if (data.msg_type === 'balance' && data.balance) {
           const old = accountRef.current || {};
@@ -133,8 +143,8 @@ export default function App() {
           if (!b.running || b.pending || !accountRef.current) { b.lastQuote = point; b.lastDigit = point.digit; return; }
           const cfg = configRef.current;
           if (b.count >= Number(cfg.maxTrades || 10)) { b.running = false; setBotState('stopped'); addLog('Maximum trade count reached. Bot stopped.', 'warn'); return; }
-          if (b.pnl >= Number(cfg.takeProfit || 5)) { b.running = false; setBotState('stopped'); addLog('Take-profit limit reached. Bot stopped.', 'success'); return; }
-          if (b.pnl <= -Math.abs(Number(cfg.stopLoss || 5))) { b.running = false; setBotState('stopped'); addLog('Stop-loss limit reached. Bot stopped.', 'warn'); return; }
+          if (Number(cfg.takeProfit) > 0 && b.pnl >= Number(cfg.takeProfit)) { b.running = false; setBotState('stopped'); addLog('Take-profit limit reached. Bot stopped.', 'success'); return; }
+          if (Number(cfg.stopLoss) > 0 && b.pnl <= -Math.abs(Number(cfg.stopLoss))) { b.running = false; setBotState('stopped'); addLog('Stop-loss limit reached. Bot stopped.', 'warn'); return; }
           let signal = null;
           if (cfg.strategy === 'rise') {
             if (b.lastQuote && point.quote !== b.lastQuote.quote) signal = point.quote > b.lastQuote.quote ? 'CALL' : 'PUT';
@@ -171,6 +181,7 @@ export default function App() {
         if (data.msg_type === 'proposal_open_contract' && data.proposal_open_contract) {
           const c = data.proposal_open_contract;
           if (c.is_sold) {
+            if (data.subscription?.id) { try { send({ forget: data.subscription.id }); } catch {} }
             const profit = Number(c.profit || 0);
             botRef.current.pnl += profit;
             botRef.current.pending = false; botRef.current.openContract = null;
