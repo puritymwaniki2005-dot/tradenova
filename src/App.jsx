@@ -157,7 +157,7 @@ export default function App() {
           if (signal) {
             b.pending = true; b.lastSignal = signal;
             const proposal = { proposal: 1, amount: Number(cfg.stake), basis: 'stake', contract_type: signal, currency: accountRef.current.currency || 'USD', duration: Number(cfg.duration), duration_unit: cfg.durationUnit, symbol: cfg.symbol };
-            if (signal === 'DIGITDIFF') proposal.barrier = String((point.digit + 1) % 10);
+            if (signal === 'DIGITDIFF') proposal.barrier = String(point.digit);
             try { send(proposal); addLog(`Signal ${signal} at ${point.quote}. Requesting proposal…`, 'info'); }
             catch (e) { b.pending = false; addLog(e.message, 'error'); }
           }
