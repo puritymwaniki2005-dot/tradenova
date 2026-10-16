@@ -45,9 +45,9 @@ if (!packageJson.scripts?.build) {
 console.log('Building the exact uploaded bot:', path.relative(root, appRoot));
 console.log('Package:', packageJson.name ?? '(unnamed)', 'version:', packageJson.version ?? '(unknown)');
 
-// The GitHub Actions verification build may apply reviewed source patches without
-// changing the uploaded archive or enabling those patches in other build environments.
-if (process.env.APPLY_GITHUB_BOT_PATCHES === 'true') {
+// Apply the reviewed Deriv-App-ID request-header patch for deployment builds as well
+// as verification builds. Set APPLY_GITHUB_BOT_PATCHES=false only to explicitly opt out.
+if (process.env.APPLY_GITHUB_BOT_PATCHES !== 'false') {
   execFileSync('node', [path.join(root, 'scripts', 'apply-github-bot-patches.mjs'), appRoot], {
     env: process.env,
     stdio: 'inherit',
