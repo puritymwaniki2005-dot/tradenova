@@ -24,6 +24,10 @@ function walk(directory) {
     scanned += 1;
     const before = readFileSync(file, 'utf8');
     let after = before;
+    // Remove the whole guard element, not merely its text, so no blank bar or top padding remains.
+    after = after.replace(/<div\\b[^>]*id=["']tnx-live-guard["'][^>]*>[\\s\\S]*?<\\/div>\\s*/gi, '');
+    after = after.replace(/#tnx-live-guard\\s*\\{[^}]*\\}/gi, '');
+    after = after.replace(/body\\s*\\{\\s*padding-top\\s*:\s*32px\\s*!important\\s*;?\\s*\\}/gi, '');
     for (const pattern of removeCopy) after = after.replace(pattern, '');
     if (after !== before) {
       writeFileSync(file, after);
