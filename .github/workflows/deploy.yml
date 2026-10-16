@@ -20,6 +20,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Verify bot patches and banner cleanup
+        run: |
+          node scripts/test-github-bot-patches.mjs
+          node scripts/test-remove-deriv-mode-banner.mjs
       - name: Build the uploaded ZIP application
         env:
           NEXT_PUBLIC_DERIV_APP_ID: 34g3dK2hXuNSYEMsOUlvT
