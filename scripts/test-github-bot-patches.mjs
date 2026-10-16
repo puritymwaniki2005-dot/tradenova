@@ -42,7 +42,7 @@ try {
   const patchedHelper = readFileSync(path.join(tempRoot, helperPath), 'utf8');
   assert.ok(patchedHelper.includes('visited: WeakSet<object>'),
     'Recursive error inspection must track visited objects to avoid circular-reference overflow.');
-  const match = patchedHelper.match(/export const findValueByKeyRecursively = [\\s\\S]*?\\n};/);
+  const match = patchedHelper.match(/export const findValueByKeyRecursively = [\s\S]*?\n};);
   assert.ok(match, 'Patched recursive helper must be present.');
   const runnableFunction = match[0].replace(
     '(obj: any, key: string, visited: WeakSet<object> = new WeakSet())',
