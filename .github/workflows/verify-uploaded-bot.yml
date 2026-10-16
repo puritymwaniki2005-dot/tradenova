@@ -6,6 +6,7 @@ on:
       - "bot-app (2).zip"
       - "scripts/build-uploaded-bot.mjs"
       - "scripts/apply-github-bot-patches.mjs"
+      - "scripts/test-github-bot-patches.mjs"
       - "vercel.json"
       - ".github/workflows/verify-uploaded-bot.yml"
   workflow_dispatch:
@@ -27,6 +28,9 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: package-lock.json
+
+      - name: Test Deriv API header patch against the original uploaded source
+        run: node scripts/test-github-bot-patches.mjs
 
       - name: Build the exact uploaded bot using the shared deployment script
         env:
