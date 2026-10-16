@@ -7,7 +7,10 @@ if (!appRoot) throw new Error('Pass the extracted bot application root.');
 const target = path.join(appRoot, 'src', 'services', 'derivws-accounts.service.ts');
 const source = readFileSync(target, 'utf8');
 const oldHeader = "Authorization: `Bearer ${accessToken}`,";
-const newHeader = "Authorization: `Bearer ${accessToken}`,\\n                        ...(process.env.NEXT_PUBLIC_DERIV_APP_ID ? { 'Deriv-App-ID': process.env.NEXT_PUBLIC_DERIV_APP_ID } : {}),";
+const newHeader = [
+  "Authorization: `Bearer ${accessToken}`,",
+  "                        ...(process.env.NEXT_PUBLIC_DERIV_APP_ID ? { 'Deriv-App-ID': process.env.NEXT_PUBLIC_DERIV_APP_ID } : {}),",
+].join('\n');
 
 const matches = source.split(oldHeader).length - 1;
 if (matches !== 2) {
@@ -17,5 +20,5 @@ if (source.includes("'Deriv-App-ID': process.env.NEXT_PUBLIC_DERIV_APP_ID")) {
   console.log('Deriv-App-ID header patch already present; no change needed.');
   process.exit(0);
 }
-writeFileSync(target, source.split(oldHeader).join(newHeader.replace('\\n', '\n')));
+writeFileSync(target, source.split(oldHeader).join(newHeader));
 console.log('Applied GitHub-only Deriv-App-ID header patch to account and OTP requests.');
