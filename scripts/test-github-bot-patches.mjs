@@ -84,6 +84,8 @@ try {
     'Rejected requests and subscription errors must check readiness, in addition to the success path.');
   assert.ok(patchedProposal.includes('errorDetails.echo_req ?? {}'),
     'Rejected proposal requests must be recorded so the bot does not wait forever.');
+  assert.ok(patchedProposal.includes('errorDetails.echo_req?.passthrough ?? {}'),
+    'Rejected requests must retain nested purchase references when matching readiness.');
   const serviceOnce = patchedService;
   const helperOnce = patchedHelper;
   const rsbuildOnce = patchedRsbuild;
