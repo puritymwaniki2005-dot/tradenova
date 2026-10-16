@@ -4,7 +4,7 @@ import path from 'node:path';
 const appRoot = process.argv[2];
 if (!appRoot) throw new Error('Pass the extracted bot application root.');
 
-const sourceExtensions = new Set(['.tsx', '.ts', '.jsx', '.js', '.html']);
+const sourceExtensions = new Set(['.tsx', '.ts', '.jsx', '.js', '.html', '.css']);
 const removeCopy = [
   /🟢\s*DERIV TRADING MODE\s*[—–-]?/gi,
   /REAL and DEMO accounts supported\s*[—–-]?/gi,
