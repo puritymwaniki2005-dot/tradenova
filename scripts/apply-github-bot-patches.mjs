@@ -94,6 +94,56 @@ const newHelper = `export const findValueByKeyRecursively = (obj: any, key: stri
 };`;
 replaceExactlyOnce(helperFile, oldHelper, newHelper, 'cycle-safe recursive error inspection');
 
+const proposalFile = path.join(appRoot, 'src', 'external', 'bot-skeleton', 'services', 'tradeEngine', 'trade', 'Proposal.js');
+replaceExactlyOnce(
+  proposalFile,
+  `                                error: localizedError,
+                            });
+
+                            return null;
+                        }
+                        if (!has_informed_error) {
+                            has_informed_error = true;
+                            // Use localized error message for general errors
+                            const localizedErrorMessage = error.error.code
+                                ? getLocalizedErrorMessage(error.error.code, error.error)
+                                : error.error.message || getLocalizedErrorMessage('GeneralError');`,
+  `                                error: localizedError,
+                            });
+                            // An invalid proposal still counts as a response; let the opposite
+                            // contract proposal become ready instead of leaving the bot waiting forever.
+                            this.checkProposalReady();
+
+                            return null;
+                        }
+                        if (!has_informed_error) {
+                            has_informed_error = true;
+                            // Use localized error message for general errors, even for malformed errors.
+                            const errorDetails = error?.error ?? {};
+                            const localizedErrorMessage = errorDetails.code
+                                ? getLocalizedErrorMessage(errorDetails.code, errorDetails)
+                                : errorDetails.message || error?.message || getLocalizedErrorMessage('GeneralError');`,
+  'proposal request error readiness and safe error handling'
+);
+replaceExactlyOnce(
+  proposalFile,
+  `                        this.data.proposals.push({
+                            ...passthrough,
+                            error: localizedError,
+                        });
+                        return;
+                    }`,
+  `                        this.data.proposals.push({
+                            ...passthrough,
+                            error: localizedError,
+                        });
+                        // Error responses also satisfy the response slot for this template.
+                        this.checkProposalReady();
+                        return;
+                    }`,
+  'proposal subscription error readiness'
+);
+
 const rsbuildFile = path.join(appRoot, 'rsbuild.config.ts');
 const oldAssetPrefix = "        NEXT_PUBLIC_APP_BUILD: JSON.stringify(process.env.NEXT_PUBLIC_APP_BUILD ?? ''),";
 const newAssetPrefix = oldAssetPrefix + "\n        NEXT_PUBLIC_ASSET_PREFIX: JSON.stringify(process.env.NEXT_PUBLIC_ASSET_PREFIX ?? ''),";
