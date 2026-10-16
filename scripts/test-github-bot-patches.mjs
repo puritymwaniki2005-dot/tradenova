@@ -80,8 +80,10 @@ try {
   const patchedProposal = readFileSync(path.join(tempRoot, proposalPath), 'utf8');
   assert.ok(patchedProposal.includes('const errorDetails = error?.error ?? {};'),
     'Malformed Deriv errors must be handled without throwing a second error.');
-  assert.ok((patchedProposal.match(/this\.checkProposalReady\(\);/g) || []).length >= 3,
-    'Both proposal-error paths must check readiness, in addition to the success path.');
+  assert.ok((patchedProposal.match(/this\.checkProposalReady\(\);/g) || []).length >= 4,
+    'Rejected requests and subscription errors must check readiness, in addition to the success path.');
+  assert.ok(patchedProposal.includes('errorDetails.echo_req ?? {}'),
+    'Rejected proposal requests must be recorded so the bot does not wait forever.');
   const serviceOnce = patchedService;
   const helperOnce = patchedHelper;
   const rsbuildOnce = patchedRsbuild;
