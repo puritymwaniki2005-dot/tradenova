@@ -122,7 +122,19 @@ replaceExactlyOnce(
                             const errorDetails = error?.error ?? {};
                             const localizedErrorMessage = errorDetails.code
                                 ? getLocalizedErrorMessage(errorDetails.code, errorDetails)
-                                : errorDetails.message || error?.message || getLocalizedErrorMessage('GeneralError');`,
+                                : errorDetails.message || error?.message || getLocalizedErrorMessage('GeneralError');
+                            const localizedError = {
+                                ...errorDetails,
+                                message: localizedErrorMessage,
+                            };
+                            // Record a rejected proposal as a response so the bot cannot wait forever.
+                            this.data.proposals.push({
+                                ...(errorDetails.echo_req ?? {}),
+                                ...(error?.echo_req?.passthrough ?? {}),
+                                ...(errorDetails.passthrough ?? {}),
+                                error: localizedError,
+                            });
+                            this.checkProposalReady();`,
   'proposal request error readiness and safe error handling'
 );
 replaceExactlyOnce(
