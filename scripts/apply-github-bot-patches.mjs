@@ -93,3 +93,22 @@ const newHelper = `export const findValueByKeyRecursively = (obj: any, key: stri
     return undefined;
 };`;
 replaceExactlyOnce(helperFile, oldHelper, newHelper, 'cycle-safe recursive error inspection');
+
+const rsbuildFile = path.join(appRoot, 'rsbuild.config.ts');
+const oldAssetPrefix = "        NEXT_PUBLIC_APP_BUILD: JSON.stringify(process.env.NEXT_PUBLIC_APP_BUILD ?? ''),";
+const newAssetPrefix = oldAssetPrefix + "\n        NEXT_PUBLIC_ASSET_PREFIX: JSON.stringify(process.env.NEXT_PUBLIC_ASSET_PREFIX ?? ''),";
+replaceExactlyOnce(rsbuildFile, oldAssetPrefix, newAssetPrefix, 'static asset-prefix environment');
+replaceExactlyOnce(
+  rsbuildFile,
+  "    assetPrefix: isStaticBuild ? '/bot/preview/' : '/',",
+  "    assetPrefix: process.env.NEXT_PUBLIC_ASSET_PREFIX || (isStaticBuild ? '/bot/preview/' : '/'),",
+  'GitHub Pages asset base path'
+);
+
+const appFile = path.join(appRoot, 'src', 'app', 'App.tsx');
+replaceExactlyOnce(
+  appFile,
+  "const routerBasename = isPreviewMode() ? PREVIEW_BASE_PATH : undefined;",
+  "const routerBasename = isPreviewMode() ? PREVIEW_BASE_PATH : (process.env.NEXT_PUBLIC_ASSET_PREFIX?.replace(/\\/$/, '') || undefined);",
+  'GitHub Pages router base path'
+);
