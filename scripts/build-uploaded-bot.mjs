@@ -54,6 +54,12 @@ if (process.env.APPLY_GITHUB_BOT_PATCHES !== 'false') {
   });
 }
 
+// Remove the explicitly unwanted trading-mode banner copy from the actual ZIP app.
+execFileSync('node', [path.join(root, 'scripts', 'remove-deriv-mode-banner.mjs'), appRoot], {
+  env: process.env,
+  stdio: 'inherit',
+});
+
 const env = {
   ...process.env,
   NEXT_PUBLIC_DERIV_APP_ID: process.env.NEXT_PUBLIC_DERIV_APP_ID || '34g3dK2hXuNSYEMsOUlvT',
