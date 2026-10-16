@@ -10,17 +10,23 @@ const archive = path.join(root, 'bot-app (2).zip');
 const patchScript = path.join(root, 'scripts', 'apply-github-bot-patches.mjs');
 const servicePath = 'src/services/derivws-accounts.service.ts';
 const helperPath = 'src/components/shared/utils/object/object.ts';
+const rsbuildPath = 'rsbuild.config.ts';
+const appPath = 'src/app/App.tsx';
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'tradenovax-deriv-patch-test-'));
 
 try {
   const originalService = execFileSync('unzip', ['-p', archive, servicePath], { encoding: 'utf8' });
   const originalHelper = execFileSync('unzip', ['-p', archive, helperPath], { encoding: 'utf8' });
+  const originalRsbuild = execFileSync('unzip', ['-p', archive, rsbuildPath], { encoding: 'utf8' });
+  const originalApp = execFileSync('unzip', ['-p', archive, appPath], { encoding: 'utf8' });
   assert.ok(originalService.length > 0, 'Uploaded archive must contain the Deriv account service.');
   assert.ok(originalHelper.length > 0, 'Uploaded archive must contain the shared object helper.');
+  assert.ok(originalRsbuild.length > 0, 'Uploaded archive must contain the Rsbuild config.');
+  assert.ok(originalApp.length > 0, 'Uploaded archive must contain the app router.');
   assert.equal(originalService.split("Authorization: `Bearer ${accessToken}`,").length - 1, 2,
     'Expected account-list and OTP requests to use bearer authorization.');
 
-  for (const [relativePath, content] of [[servicePath, originalService], [helperPath, originalHelper]]) {
+  for (const [relativePath, content] of [[servicePath, originalService], [helperPath, originalHelper], [rsbuildPath, originalRsbuild], [appPath, originalApp]]) {
     const file = path.join(tempRoot, relativePath);
     mkdirSync(path.dirname(file), { recursive: true });
     writeFileSync(file, content);
@@ -60,13 +66,27 @@ try {
   assert.equal(findValueByKeyRecursively(null, 'msg_type'), undefined,
     'Should safely handle null error values.');
 
+  const patchedRsbuild = readFileSync(path.join(tempRoot, rsbuildPath), 'utf8');
+  assert.ok(patchedRsbuild.includes('NEXT_PUBLIC_ASSET_PREFIX: JSON.stringify(process.env.NEXT_PUBLIC_ASSET_PREFIX ?? \'\')'),
+    'Build config must expose the optional static asset prefix.');
+  assert.ok(patchedRsbuild.includes("assetPrefix: process.env.NEXT_PUBLIC_ASSET_PREFIX || (isStaticBuild ? '/bot/preview/' : '/')"),
+    'Build config must allow GitHub Pages assets to load from the repository subpath.');
+  const patchedApp = readFileSync(path.join(tempRoot, appPath), 'utf8');
+  assert.ok(patchedApp.includes("process.env.NEXT_PUBLIC_ASSET_PREFIX?.replace(/\\/$/, '')"),
+    'Router must use the configured GitHub Pages base path.');
   const serviceOnce = patchedService;
   const helperOnce = patchedHelper;
+  const rsbuildOnce = patchedRsbuild;
+  const appOnce = patchedApp;
   runPatch();
   assert.equal(readFileSync(path.join(tempRoot, servicePath), 'utf8'), serviceOnce,
     'Header patch must be idempotent.');
   assert.equal(readFileSync(path.join(tempRoot, helperPath), 'utf8'), helperOnce,
     'Cycle-safe patch must be idempotent.');
+  assert.equal(readFileSync(path.join(tempRoot, rsbuildPath), 'utf8'), rsbuildOnce,
+    'Asset-prefix patch must be idempotent.');
+  assert.equal(readFileSync(path.join(tempRoot, appPath), 'utf8'), appOnce,
+    'Router-base patch must be idempotent.');
   console.log('Deriv API header and circular-error regression tests passed.');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
