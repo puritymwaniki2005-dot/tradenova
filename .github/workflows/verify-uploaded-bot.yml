@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - "bot-app (2).zip"
+      - "scripts/build-uploaded-bot.mjs"
+      - "vercel.json"
       - ".github/workflows/verify-uploaded-bot.yml"
   workflow_dispatch:
 
@@ -13,7 +15,7 @@ permissions:
 jobs:
   verify-bot-build:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -25,28 +27,15 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
 
-      - name: Extract the exact uploaded bot archive
-        run: |
-          mkdir -p bot-app-source
-          unzip -q "bot-app (2).zip" -d bot-app-source
-          test -f bot-app-source/package.json
-          echo "Uploaded archive extracted successfully."
-          node -e "const p=require('./bot-app-source/package.json'); console.log('Package:', p.name, p.version); console.log('Build script:', p.scripts?.build || 'MISSING'); if (!p.scripts?.build) process.exit(1)"
-
-      - name: Install uploaded bot dependencies
-        working-directory: bot-app-source
-        run: npm install --no-audit --no-fund
-
-      - name: Build uploaded bot without changing its source
-        working-directory: bot-app-source
+      - name: Build the exact uploaded bot using the shared deployment script
         env:
           NEXT_PUBLIC_DERIV_APP_ID: 34g3dK2hXuNSYEMsOUlvT
           NEXT_PUBLIC_DERIV_APP_NAME: TradeNovaX
           NEXT_PUBLIC_DERIV_ENV: production
           NEXT_PUBLIC_DERIV_OAUTH_SCOPES: trade
-        run: npm run build
+        run: node scripts/build-uploaded-bot.mjs
 
-      - name: Save build output for verification
+      - name: Save verified build output
         uses: actions/upload-artifact@v4
         with:
           name: tradenovax-uploaded-bot-build
