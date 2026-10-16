@@ -51,6 +51,8 @@ const env = {
   NEXT_PUBLIC_DERIV_APP_NAME: process.env.NEXT_PUBLIC_DERIV_APP_NAME || 'TradeNovaX',
   NEXT_PUBLIC_DERIV_ENV: process.env.NEXT_PUBLIC_DERIV_ENV || 'production',
   NEXT_PUBLIC_DERIV_OAUTH_SCOPES: process.env.NEXT_PUBLIC_DERIV_OAUTH_SCOPES || 'trade',
+  // This is a standalone root deployment, not the nested static preview build.
+  NEXT_PUBLIC_APP_BUILD: process.env.NEXT_PUBLIC_APP_BUILD || '',
 };
 
 execFileSync('npm', ['install', '--include=dev', '--no-audit', '--no-fund'], {
