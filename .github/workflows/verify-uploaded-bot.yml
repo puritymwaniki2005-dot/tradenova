@@ -1,0 +1,55 @@
+name: Verify uploaded TradeNovaX bot
+
+on:
+  push:
+    paths:
+      - "bot-app (2).zip"
+      - ".github/workflows/verify-uploaded-bot.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-bot-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Extract the exact uploaded bot archive
+        run: |
+          mkdir -p bot-app-source
+          unzip -q "bot-app (2).zip" -d bot-app-source
+          test -f bot-app-source/package.json
+          echo "Uploaded archive extracted successfully."
+          node -e "const p=require('./bot-app-source/package.json'); console.log('Package:', p.name, p.version); console.log('Build script:', p.scripts?.build || 'MISSING'); if (!p.scripts?.build) process.exit(1)"
+
+      - name: Install uploaded bot dependencies
+        working-directory: bot-app-source
+        run: npm install --no-audit --no-fund
+
+      - name: Build uploaded bot without changing its source
+        working-directory: bot-app-source
+        env:
+          NEXT_PUBLIC_DERIV_APP_ID: 34g3dK2hXuNSYEMsOUlvT
+          NEXT_PUBLIC_DERIV_APP_NAME: TradeNovaX
+          NEXT_PUBLIC_DERIV_ENV: production
+          NEXT_PUBLIC_DERIV_OAUTH_SCOPES: trade
+        run: npm run build
+
+      - name: Save build output for verification
+        uses: actions/upload-artifact@v4
+        with:
+          name: tradenovax-uploaded-bot-build
+          path: bot-app-source/dist/
+          if-no-files-found: error
+          retention-days: 7
