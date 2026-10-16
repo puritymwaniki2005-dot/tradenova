@@ -130,6 +130,7 @@ replaceExactlyOnce(
                             // Record a rejected proposal as a response so the bot cannot wait forever.
                             this.data.proposals.push({
                                 ...(errorDetails.echo_req ?? {}),
+                                ...(errorDetails.echo_req?.passthrough ?? {}),
                                 ...(error?.echo_req?.passthrough ?? {}),
                                 ...(errorDetails.passthrough ?? {}),
                                 error: localizedError,
