@@ -116,26 +116,26 @@ replaceExactlyOnce(
 
                             return null;
                         }
+                        // Use localized error message for general errors, even for malformed errors.
+                        const errorDetails = error?.error ?? {};
+                        const localizedErrorMessage = errorDetails.code
+                            ? getLocalizedErrorMessage(errorDetails.code, errorDetails)
+                            : errorDetails.message || error?.message || getLocalizedErrorMessage('GeneralError');
+                        const localizedError = {
+                            ...errorDetails,
+                            message: localizedErrorMessage,
+                        };
+                        // Every rejected request must occupy its proposal slot; only the log is deduplicated.
+                        this.data.proposals.push({
+                            ...(errorDetails.echo_req ?? {}),
+                            ...(errorDetails.echo_req?.passthrough ?? {}),
+                            ...(error?.echo_req?.passthrough ?? {}),
+                            ...(errorDetails.passthrough ?? {}),
+                            error: localizedError,
+                        });
+                        this.checkProposalReady();
                         if (!has_informed_error) {
-                            has_informed_error = true;
-                            // Use localized error message for general errors, even for malformed errors.
-                            const errorDetails = error?.error ?? {};
-                            const localizedErrorMessage = errorDetails.code
-                                ? getLocalizedErrorMessage(errorDetails.code, errorDetails)
-                                : errorDetails.message || error?.message || getLocalizedErrorMessage('GeneralError');
-                            const localizedError = {
-                                ...errorDetails,
-                                message: localizedErrorMessage,
-                            };
-                            // Record a rejected proposal as a response so the bot cannot wait forever.
-                            this.data.proposals.push({
-                                ...(errorDetails.echo_req ?? {}),
-                                ...(errorDetails.echo_req?.passthrough ?? {}),
-                                ...(error?.echo_req?.passthrough ?? {}),
-                                ...(errorDetails.passthrough ?? {}),
-                                error: localizedError,
-                            });
-                            this.checkProposalReady();`,
+                            has_informed_error = true;`,
   'proposal request error readiness and safe error handling'
 );
 replaceExactlyOnce(
