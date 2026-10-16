@@ -12,6 +12,7 @@ const servicePath = 'src/services/derivws-accounts.service.ts';
 const helperPath = 'src/components/shared/utils/object/object.ts';
 const rsbuildPath = 'rsbuild.config.ts';
 const appPath = 'src/app/App.tsx';
+const proposalPath = 'src/external/bot-skeleton/services/tradeEngine/trade/Proposal.js';
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'tradenovax-deriv-patch-test-'));
 
 try {
@@ -19,14 +20,16 @@ try {
   const originalHelper = execFileSync('unzip', ['-p', archive, helperPath], { encoding: 'utf8' });
   const originalRsbuild = execFileSync('unzip', ['-p', archive, rsbuildPath], { encoding: 'utf8' });
   const originalApp = execFileSync('unzip', ['-p', archive, appPath], { encoding: 'utf8' });
+  const originalProposal = execFileSync('unzip', ['-p', archive, proposalPath], { encoding: 'utf8' });
   assert.ok(originalService.length > 0, 'Uploaded archive must contain the Deriv account service.');
   assert.ok(originalHelper.length > 0, 'Uploaded archive must contain the shared object helper.');
   assert.ok(originalRsbuild.length > 0, 'Uploaded archive must contain the Rsbuild config.');
   assert.ok(originalApp.length > 0, 'Uploaded archive must contain the app router.');
+  assert.ok(originalProposal.length > 0, 'Uploaded archive must contain the Deriv proposal engine.');
   assert.equal(originalService.split("Authorization: `Bearer ${accessToken}`,").length - 1, 2,
     'Expected account-list and OTP requests to use bearer authorization.');
 
-  for (const [relativePath, content] of [[servicePath, originalService], [helperPath, originalHelper], [rsbuildPath, originalRsbuild], [appPath, originalApp]]) {
+  for (const [relativePath, content] of [[servicePath, originalService], [helperPath, originalHelper], [rsbuildPath, originalRsbuild], [appPath, originalApp], [proposalPath, originalProposal]]) {
     const file = path.join(tempRoot, relativePath);
     mkdirSync(path.dirname(file), { recursive: true });
     writeFileSync(file, content);
@@ -74,10 +77,16 @@ try {
   const patchedApp = readFileSync(path.join(tempRoot, appPath), 'utf8');
   assert.ok(patchedApp.includes("process.env.NEXT_PUBLIC_ASSET_PREFIX?.replace(/\\/$/, '')"),
     'Router must use the configured GitHub Pages base path.');
+  const patchedProposal = readFileSync(path.join(tempRoot, proposalPath), 'utf8');
+  assert.ok(patchedProposal.includes('const errorDetails = error?.error ?? {};'),
+    'Malformed Deriv errors must be handled without throwing a second error.');
+  assert.ok((patchedProposal.match(/this\.checkProposalReady\(\);/g) || []).length >= 3,
+    'Both proposal-error paths must check readiness, in addition to the success path.');
   const serviceOnce = patchedService;
   const helperOnce = patchedHelper;
   const rsbuildOnce = patchedRsbuild;
   const appOnce = patchedApp;
+  const proposalOnce = patchedProposal;
   runPatch();
   assert.equal(readFileSync(path.join(tempRoot, servicePath), 'utf8'), serviceOnce,
     'Header patch must be idempotent.');
@@ -87,7 +96,9 @@ try {
     'Asset-prefix patch must be idempotent.');
   assert.equal(readFileSync(path.join(tempRoot, appPath), 'utf8'), appOnce,
     'Router-base patch must be idempotent.');
-  console.log('Deriv API header and circular-error regression tests passed.');
+  assert.equal(readFileSync(path.join(tempRoot, proposalPath), 'utf8'), proposalOnce,
+    'Proposal readiness patch must be idempotent.');
+  console.log('Deriv API header, circular-error, and proposal-readiness regression tests passed.');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }
