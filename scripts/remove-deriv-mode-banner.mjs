@@ -38,4 +38,4 @@ function walk(directory) {
 }
 
 walk(appRoot);
-console.log(\`Trading-mode banner cleanup scanned \${scanned} source files; updated \${changed}.\`);
+console.log('Trading-mode banner cleanup scanned ' + scanned + ' source files; updated ' + changed + '.');
