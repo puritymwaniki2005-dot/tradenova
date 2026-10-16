@@ -140,7 +140,7 @@ export default function App() {
           setTicks(list);
           setQuote(point);
           const b = botRef.current;
-          if (!b.running || b.pending || !accountRef.current) { b.lastQuote = point; b.lastDigit = point.digit; return; }
+          if (!b.running || b.pending || b.openContract || !accountRef.current) { b.lastQuote = point; b.lastDigit = point.digit; return; }
           const cfg = configRef.current;
           if (b.count >= Number(cfg.maxTrades || 10)) { b.running = false; setBotState('stopped'); addLog('Maximum trade count reached. Bot stopped.', 'warn'); return; }
           if (Number(cfg.takeProfit) > 0 && b.pnl >= Number(cfg.takeProfit)) { b.running = false; setBotState('stopped'); addLog('Take-profit limit reached. Bot stopped.', 'success'); return; }
@@ -217,6 +217,8 @@ export default function App() {
   };
 
   const startBot = () => {
+    if (botRef.current.openContract) { setNotice(`Contract #${botRef.current.openContract} is still being monitored. The bot cannot start another run until Deriv confirms that contract is closed.`); addLog('Start blocked: an existing contract is still open or its final status is not yet confirmed.', 'warn'); return; }
+    if (botRef.current.pending) { setNotice('A trade request is still pending. Wait for Deriv to confirm its result before restarting the bot.'); return; }
     if (!account) { setNotice('Connect and authorize a Deriv demo account before starting.'); return; }
     if (!account.isDemo && !confirmLive) { setNotice('Real account detected. Tick “I understand this can place real-money trades” before starting.'); return; }
     if (!Number.isFinite(Number(stake)) || Number(stake) <= 0 || !Number.isFinite(Number(duration)) || Number(duration) <= 0) { setNotice('Stake and duration must be positive numbers.'); return; }
