@@ -60,6 +60,12 @@ execFileSync('node', [path.join(root, 'scripts', 'remove-deriv-mode-banner.mjs')
   stdio: 'inherit',
 });
 
+// Emit the exact source around window.send so recursive wrappers can be diagnosed from CI logs.
+execFileSync('node', [path.join(root, 'scripts', 'audit-window-send.mjs'), appRoot], {
+  env: process.env,
+  stdio: 'inherit',
+});
+
 const env = {
   ...process.env,
   NEXT_PUBLIC_DERIV_APP_ID: process.env.NEXT_PUBLIC_DERIV_APP_ID || '34g3dK2hXuNSYEMsOUlvT',
