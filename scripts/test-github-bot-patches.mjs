@@ -86,6 +86,12 @@ try {
     'Rejected proposal requests must be recorded so the bot does not wait forever.');
   assert.ok(patchedProposal.includes('errorDetails.echo_req?.passthrough ?? {}'),
     'Rejected requests must retain nested purchase references when matching readiness.');
+  const rejectedRequestStart = patchedProposal.indexOf('const errorDetails = error?.error ?? {};');
+  const rejectedRequestPush = patchedProposal.indexOf('this.data.proposals.push({', rejectedRequestStart);
+  const deduplicatedErrorNotice = patchedProposal.indexOf('if (!has_informed_error)', rejectedRequestStart);
+  assert.ok(rejectedRequestStart >= 0 && rejectedRequestPush > rejectedRequestStart &&
+    deduplicatedErrorNotice > rejectedRequestPush,
+    'Every rejected request must be recorded before error-notification deduplication.');
   const serviceOnce = patchedService;
   const helperOnce = patchedHelper;
   const rsbuildOnce = patchedRsbuild;
