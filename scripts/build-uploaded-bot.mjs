@@ -53,7 +53,7 @@ const env = {
   NEXT_PUBLIC_DERIV_OAUTH_SCOPES: process.env.NEXT_PUBLIC_DERIV_OAUTH_SCOPES || 'trade',
 };
 
-execFileSync('npm', ['install', '--no-audit', '--no-fund'], {
+execFileSync('npm', ['install', '--include=dev', '--no-audit', '--no-fund'], {
   cwd: appRoot,
   env,
   stdio: 'inherit',
