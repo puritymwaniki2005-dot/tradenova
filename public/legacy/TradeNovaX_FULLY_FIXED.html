@@ -1349,6 +1349,77 @@ html,body{width:100%;max-width:100%;overflow-x:clip!important}
 }
 </style>
 
+
+<style id="tnx-mobile-layout-final-fix">
+/* Correct the mobile layout from the live-phone screenshot. */
+@media(max-width:900px){
+  html,body{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
+  body{padding-top:88px!important}
+  .tnx-mobile-header{
+    top:32px!important;height:56px!important;min-height:56px!important;
+    padding:6px 12px!important;gap:10px!important;align-items:center!important;
+    overflow:hidden!important
+  }
+  .tnx-mobile-menu{flex:0 0 40px!important;width:40px!important;height:40px!important}
+  .tnx-mobile-brand{flex:0 1 auto!important;min-width:0!important;font-size:15px!important;line-height:1.2!important}
+  .tnx-mobile-spacer{flex:1 1 auto!important;min-width:4px!important}
+  .tnx-mobile-status{flex:0 0 auto!important;max-width:24vw!important;overflow:hidden!important}
+  /* Keep the actual page toolbar in normal flow; never let account controls hang off-screen. */
+  main.main-content{padding-top:8px!important}
+  .topbar{position:relative!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important;width:100%!important;height:auto!important;min-height:0!important;overflow:visible!important}
+  .topbar-left{display:none!important}
+  .topbar-right{position:relative!important;inset:auto!important;display:flex!important;flex-flow:row wrap!important;align-items:center!important;justify-content:flex-start!important;width:100%!important;max-width:100%!important;min-width:0!important;gap:7px!important;overflow:visible!important}
+  .topbar-right>*{position:static!important;float:none!important;flex:0 1 auto!important;min-width:0!important;max-width:100%!important}
+  .topbar-right .balance{order:1!important}
+  .account-selector{order:2!important;display:flex!important;align-items:center!important;gap:4px!important;max-width:100%!important;padding:4px 6px!important}
+  .account-selector .account-btn{min-width:48px!important;padding:7px 9px!important}
+  .deriv-status{order:3!important;max-width:100%!important;overflow-wrap:anywhere!important}
+  #tnxReconnectDeriv{order:4!important}
+  .btn-logout{order:5!important}
+  /* The sidebar links become a deliberate, horizontally scrollable tab strip. */
+  .sidebar-nav{
+    position:relative!important;display:flex!important;flex-flow:row nowrap!important;
+    align-items:stretch!important;gap:0!important;width:100%!important;max-width:100%!important;
+    overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important;
+    scrollbar-width:none!important;-webkit-overflow-scrolling:touch!important;
+    padding:0!important;margin:0!important;border-radius:0!important
+  }
+  .sidebar-nav::-webkit-scrollbar{display:none!important}
+  .sidebar-nav .nav-label{display:none!important}
+  .sidebar-nav a[data-page]{
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    flex:0 0 auto!important;width:auto!important;min-width:max-content!important;
+    min-height:58px!important;padding:10px 18px!important;margin:0!important;
+    border-radius:0!important;white-space:nowrap!important
+  }
+  .sidebar-nav a[data-page] .icon{margin-right:8px!important}
+  .sidebar-nav a[data-page] .badge{margin-left:8px!important}
+  .tnx-dash-hero{margin-top:12px!important}
+  .tnx-dash-hero-actions{width:100%!important;min-width:0!important}
+  .tnx-dash-hero-actions>*{max-width:100%!important}
+  .tnx-dash-metrics{min-width:0!important}
+  /* Small notifications remain readable without covering the balance cards. */
+  .toast{
+    position:fixed!important;top:104px!important;right:10px!important;bottom:auto!important;left:auto!important;
+    width:min(320px,calc(100vw - 20px))!important;max-width:calc(100vw - 20px)!important;
+    z-index:100100!important;padding:12px 14px!important;border-radius:12px!important;
+    box-shadow:0 12px 32px rgba(0,0,0,.32)!important;line-height:1.4!important
+  }
+  .toast .toast-icon{display:none!important}
+  #toastMessage{display:block!important;overflow-wrap:anywhere!important}
+}
+@media(max-width:560px){
+  .tnx-mobile-header{padding-left:10px!important;padding-right:10px!important}
+  .sidebar-nav a[data-page]{padding:10px 14px!important;font-size:13px!important}
+  .tnx-dash-hero{padding:18px!important}
+  .tnx-dash-hero h2{font-size:clamp(24px,6vw,32px)!important}
+  .tnx-dash-hero p{font-size:14px!important;line-height:1.55!important}
+  .topbar-right{gap:6px!important}
+  .account-selector{gap:3px!important}
+  .toast{top:96px!important;right:8px!important;width:calc(100vw - 16px)!important;max-width:360px!important}
+}
+</style>
+
 </head>
 <body>
 <div class="tnx-mobile-header" id="tnxMobileHeader">
@@ -2106,7 +2177,7 @@ let recentTransactions=[], activeContracts=new Map(), subscribedOpenContracts=ne
 let reconnectTimer=null, reconnectAttempts=0, digitDurationMin=1, digitDurationMax=10, digitDurationUnit='t', digitDefaultStake=10, digitContracts=[];
 const DIGIT_CONTRACT_TYPES=['DIGITMATCH','DIGITDIFF','DIGITOVER','DIGITUNDER','DIGITEVEN','DIGITODD'];
 
-function showToast(message){const toast=document.getElementById('toast'),msg=document.getElementById('toastMessage');if(!toast||!msg){console.log(message);return}msg.textContent=message;toast.classList.add('show');clearTimeout(toast._timer);toast._timer=setTimeout(()=>toast.classList.remove('show'),3500)}
+function showToast(message){const toast=document.getElementById('toast'),msg=document.getElementById('toastMessage');if(!toast||!msg){console.log(message);return}const clean=String(message??'').replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,'').replace(/\s{2,}/g,' ').trim();msg.textContent=clean;toast.classList.add('show');clearTimeout(toast._timer);toast._timer=setTimeout(()=>toast.classList.remove('show'),4500)}
 window.showToast=showToast;
 function readTokenFromStore(store){try{const token=store.getItem('deriv_access_token');let raw=Number(store.getItem('deriv_token_expiry')||0);if(raw&&raw<100000000000)raw*=1000;if(token&&(!raw||Date.now()<raw))return token;}catch{}return null}
 function getAccessToken(){for(const store of [sessionStorage,localStorage]){const token=readTokenFromStore(store);if(token)return token;}try{const raw=localStorage.getItem('deriv_tokens_backup')||sessionStorage.getItem('deriv_tokens_backup');if(raw){const data=JSON.parse(raw);const exp=Number(data?.expires_at||data?.expiry||0);const expiresAt=exp?(exp<100000000000?exp*1000:exp):(data?.expires_in?Date.now()+Number(data.expires_in)*1000:0);if(data?.access_token&&(!expiresAt||expiresAt>Date.now()))return data.access_token;}}catch{}return null}
