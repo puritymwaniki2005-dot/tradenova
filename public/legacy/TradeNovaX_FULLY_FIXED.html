@@ -1314,6 +1314,41 @@ input,select,textarea{width:100%;min-width:0}
   .tnx-builder-summary{grid-column:3!important;display:flex!important}
 }
 </style>
+
+<style id="tnx-mobile-header-overflow-hotfix">
+/* Mobile header correction: keep brand, account controls and navigation inside the viewport. */
+html,body{width:100%;max-width:100%;overflow-x:clip!important}
+@media(max-width:900px){
+  .tnx-mobile-header{
+    top:32px!important;height:56px!important;min-height:56px!important;
+    padding:6px 12px!important;gap:10px!important;
+    display:flex!important;align-items:center!important;
+    overflow:hidden!important;
+  }
+  body{padding-top:92px!important}
+  #tnx-live-guard{height:auto!important;min-height:32px!important;padding:6px 8px!important;font-size:10px!important;line-height:1.25!important}
+  .tnx-mobile-brand{font-size:15px!important;line-height:1.1!important;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .tnx-mobile-spacer{flex:1 1 auto;min-width:4px}
+  .tnx-mobile-status{flex:0 0 auto;max-width:28vw;overflow:hidden;text-overflow:ellipsis}
+  main.main-content{padding-top:8px!important}
+  .topbar{display:flex!important;align-items:center!important;gap:8px!important;min-width:0!important}
+  .topbar-left,.topbar-right{min-width:0!important;max-width:100%!important}
+  .topbar-left{flex:1 1 100%!important}
+  .topbar-right{display:flex!important;flex-wrap:wrap!important;align-items:center!important;justify-content:flex-start!important;width:100%!important;gap:6px!important}
+  .topbar-right>*{min-width:0!important;max-width:100%!important;flex:0 1 auto!important}
+  .topbar-right button,.topbar-right a,.topbar-right select{white-space:normal!important}
+  .main-content>.topbar{margin-top:0!important;padding-top:0!important}
+  .sidebar-nav{max-width:100%}
+}
+@media(max-width:560px){
+  .tnx-mobile-header{padding-left:10px!important;padding-right:10px!important}
+  .tnx-mobile-menu{width:40px!important;height:40px!important;flex:0 0 40px!important}
+  .topbar-left h1{font-size:20px!important;line-height:1.2!important}
+  .topbar-right{column-gap:6px!important;row-gap:6px!important}
+  .topbar-right button{padding:8px 10px!important;font-size:12px!important}
+}
+</style>
+
 </head>
 <body>
 <div class="tnx-mobile-header" id="tnxMobileHeader">
