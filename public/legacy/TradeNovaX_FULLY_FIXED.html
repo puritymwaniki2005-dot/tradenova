@@ -2179,8 +2179,75 @@ const DIGIT_CONTRACT_TYPES=['DIGITMATCH','DIGITDIFF','DIGITOVER','DIGITUNDER','D
 
 function showToast(message){const toast=document.getElementById('toast'),msg=document.getElementById('toastMessage');if(!toast||!msg){console.log(message);return}const clean=String(message??'').replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,'').replace(/\s{2,}/g,' ').trim();msg.textContent=clean;toast.classList.add('show');clearTimeout(toast._timer);toast._timer=setTimeout(()=>toast.classList.remove('show'),4500)}
 window.showToast=showToast;
+// Shared TradeNovaX session policy: persist successful sign-in, expire after 30 minutes of inactivity.
+const TNX_SESSION_IDLE_MS=30*60*1000;
+const TNX_SESSION_ACTIVITY_KEY='tradenovax_session_last_activity';
+const TNX_SESSION_STARTED_KEY='tradenovax_session_started_at';
+const TNX_AUTH_STORAGE_KEYS=['deriv_access_token','deriv_token_expiry','deriv_tokens_backup','deriv_auth_code','deriv_account_id','deriv_account_type','tradenovax_real_account_id','tradenovax_demo_account_id','deriv_user_email','deriv_user_name','tradenovax_pkce_verifier','tradenovax_oauth_state'];
+let tnxSessionEnding=false,tnxLastActivityWrite=0,tnxSessionMonitorStarted=false;
+function tnxHasStoredAuth(){
+  try{
+    for(const store of [localStorage,sessionStorage]){
+      if(store.getItem('deriv_access_token'))return true;
+      const raw=store.getItem('deriv_tokens_backup');
+      if(raw&&JSON.parse(raw)?.access_token)return true;
+    }
+  }catch(_){}
+  return false;
+}
+function tnxClearStoredSession(){
+  TNX_AUTH_STORAGE_KEYS.forEach(k=>{try{localStorage.removeItem(k);sessionStorage.removeItem(k)}catch(_){}});
+  [TNX_SESSION_ACTIVITY_KEY,TNX_SESSION_STARTED_KEY].forEach(k=>{try{localStorage.removeItem(k);sessionStorage.removeItem(k)}catch(_){}});
+}
+function tnxEndSession(message,redirect=true){
+  if(tnxSessionEnding)return;
+  tnxSessionEnding=true;
+  try{if(derivWS&&derivWS.readyState<=1)derivWS.close(1000,'session ended')}catch(_){}
+  tnxClearStoredSession();
+  try{showToast(message||'Your session has ended. Please sign in again.')}catch(_){}
+  if(redirect)setTimeout(()=>{location.href='/'},900);
+}
+function tnxSessionIsValid(){
+  if(!tnxHasStoredAuth())return false;
+  let last=0;
+  try{last=Number(localStorage.getItem(TNX_SESSION_ACTIVITY_KEY)||0)}catch(_){}
+  if(!last){
+    const now=Date.now();
+    try{localStorage.setItem(TNX_SESSION_ACTIVITY_KEY,String(now));localStorage.setItem(TNX_SESSION_STARTED_KEY,String(now))}catch(_){}
+    return true;
+  }
+  if(!Number.isFinite(last)||Date.now()-last>=TNX_SESSION_IDLE_MS){
+    tnxEndSession('Your session expired after 30 minutes of inactivity. Please sign in again.');
+    return false;
+  }
+  return true;
+}
+function tnxTouchSession(){
+  if(tnxSessionEnding||!tnxHasStoredAuth()||!tnxSessionIsValid())return;
+  const now=Date.now();
+  if(now-tnxLastActivityWrite<10000)return;
+  tnxLastActivityWrite=now;
+  try{localStorage.setItem(TNX_SESSION_ACTIVITY_KEY,String(now))}catch(_){}
+}
+function tnxStartSessionMonitor(){
+  if(tnxSessionMonitorStarted)return;
+  tnxSessionMonitorStarted=true;
+  if(tnxHasStoredAuth())tnxSessionIsValid();
+  ['pointerdown','keydown','touchstart','scroll','click'].forEach(type=>document.addEventListener(type,tnxTouchSession,{passive:true}));
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')tnxTouchSession()});
+  window.addEventListener('focus',tnxTouchSession);
+  window.addEventListener('storage',event=>{
+    if((event.key===TNX_SESSION_ACTIVITY_KEY||event.key==='deriv_access_token')&&event.newValue===null&&!tnxHasStoredAuth()){
+      tnxEndSession('You have been signed out in another tab. Please sign in again.');
+    }
+  });
+  setInterval(()=>{if(tnxHasStoredAuth())tnxSessionIsValid()},15000);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',tnxStartSessionMonitor,{once:true});
+else tnxStartSessionMonitor();
+
 function readTokenFromStore(store){try{const token=store.getItem('deriv_access_token');let raw=Number(store.getItem('deriv_token_expiry')||0);if(raw&&raw<100000000000)raw*=1000;if(token&&(!raw||Date.now()<raw))return token;}catch{}return null}
-function getAccessToken(){for(const store of [sessionStorage,localStorage]){const token=readTokenFromStore(store);if(token)return token;}try{const raw=localStorage.getItem('deriv_tokens_backup')||sessionStorage.getItem('deriv_tokens_backup');if(raw){const data=JSON.parse(raw);const exp=Number(data?.expires_at||data?.expiry||0);const expiresAt=exp?(exp<100000000000?exp*1000:exp):(data?.expires_in?Date.now()+Number(data.expires_in)*1000:0);if(data?.access_token&&(!expiresAt||expiresAt>Date.now()))return data.access_token;}}catch{}return null}
+function getAccessToken(){if(!tnxSessionIsValid())return null;for(const store of [sessionStorage,localStorage]){const token=readTokenFromStore(store);if(token)return token;}try{const raw=localStorage.getItem('deriv_tokens_backup')||sessionStorage.getItem('deriv_tokens_backup');if(raw){const data=JSON.parse(raw);const exp=Number(data?.expires_at||data?.expiry||0);const expiresAt=exp?(exp<100000000000?exp*1000:exp):(data?.expires_in?Date.now()+Number(data.expires_in)*1000:0);if(data?.access_token&&(!expiresAt||expiresAt>Date.now()))return data.access_token;}}catch{}return null}
 function apiHeaders(){const token=derivToken||getAccessToken();if(!token)throw new Error('No valid Deriv OAuth session. Sign in with Deriv again.');return {'Authorization':`Bearer ${token}`,'Accept':'application/json','Content-Type':'application/json'}}
 async function derivFetch(path,options={}){let res;try{res=await fetch(DERIV_API+path,{...options,headers:{...apiHeaders(),...(options.headers||{})}})}catch(err){throw new Error(`Network error reaching Deriv (${err?.message||'request failed'}). Check HTTPS/network access and try again.`)}let data={};try{data=await res.json()}catch{}if(!res.ok){const e=data?.errors?.[0]||{};const detail=e.message||data?.message||`HTTP ${res.status}`;throw new Error(`Deriv ${res.status} ${e.code?`[${e.code}] `:''}${detail}`)}return data}
 function setConnection(ok,msg){liveConnected=ok;updateDigitConnectionUI();const text=ok?'🟢 REAL connected':'🔴 '+(msg||'Disconnected');for(const id of ['derivStatus']){const e=document.getElementById(id);if(e){e.textContent=text;e.title=ok?'Authenticated REAL Deriv WebSocket is open':String(msg||'Disconnected');e.style.color=ok?'var(--green)':'var(--red)'}}const cd=document.getElementById('connectionDisplay');if(cd){cd.textContent=ok?'REAL LIVE DATA':(msg||'Disconnected');cd.style.color=ok?'var(--green)':'var(--red)'}const dc=document.getElementById('dashConnection');if(dc){dc.textContent=ok?'REAL Connected':'Disconnected';dc.style.color=ok?'var(--green)':'var(--red)'}const rb=document.getElementById('tnxReconnectDeriv');if(rb){rb.textContent=ok?'✓ REAL Connected':'↻ Connect';rb.disabled=ok;rb.style.opacity=ok?'.7':'1'}}
@@ -2570,7 +2637,7 @@ document.addEventListener('click',function(e){
   tnxNavigateFromLink(link);
 });
 
-function handleLogout(){if(derivWS)derivWS.close();tickSubscriptionId=null;pending.clear();activeContracts.clear();subscribedOpenContracts.clear();countedClosedContracts.clear();['deriv_access_token','deriv_token_expiry','deriv_auth_code','deriv_account_id','deriv_account_type','tradenovax_real_account_id','deriv_user_email','deriv_user_name'].forEach(k=>{localStorage.removeItem(k);sessionStorage.removeItem(k)});sessionStorage.removeItem('tradenovax_pkce_verifier');sessionStorage.removeItem('tradenovax_oauth_state');showToast('👋 Logged out');setTimeout(()=>location.href='/',700)}window.handleLogout=handleLogout;
+function handleLogout(){tickSubscriptionId=null;pending.clear();activeContracts.clear();subscribedOpenContracts.clear();countedClosedContracts.clear();tnxEndSession('You have been logged out successfully.',true)}window.handleLogout=handleLogout;
 
 // ============================================================
 // NATIVE DIGITS TERMINAL — derived from the supplied Digits app
