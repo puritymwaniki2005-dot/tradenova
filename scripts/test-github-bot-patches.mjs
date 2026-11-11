@@ -13,6 +13,7 @@ const helperPath = 'src/components/shared/utils/object/object.ts';
 const rsbuildPath = 'rsbuild.config.ts';
 const appPath = 'src/app/App.tsx';
 const proposalPath = 'src/external/bot-skeleton/services/tradeEngine/trade/Proposal.js';
+const indexPath = 'index.html';
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'tradenovax-deriv-patch-test-'));
 
 try {
@@ -21,22 +22,24 @@ try {
   const originalRsbuild = execFileSync('unzip', ['-p', archive, rsbuildPath], { encoding: 'utf8' });
   const originalApp = execFileSync('unzip', ['-p', archive, appPath], { encoding: 'utf8' });
   const originalProposal = execFileSync('unzip', ['-p', archive, proposalPath], { encoding: 'utf8' });
+  const originalIndex = execFileSync('unzip', ['-p', archive, indexPath], { encoding: 'utf8' });
   assert.ok(originalService.length > 0, 'Uploaded archive must contain the Deriv account service.');
   assert.ok(originalHelper.length > 0, 'Uploaded archive must contain the shared object helper.');
   assert.ok(originalRsbuild.length > 0, 'Uploaded archive must contain the Rsbuild config.');
   assert.ok(originalApp.length > 0, 'Uploaded archive must contain the app router.');
   assert.ok(originalProposal.length > 0, 'Uploaded archive must contain the Deriv proposal engine.');
+  assert.ok(originalIndex.includes('<title>Automate Your Trades | Deriv Bot</title>'), 'Uploaded app must contain the expected source title before branding.');
   assert.equal(originalService.split("Authorization: `Bearer ${accessToken}`,").length - 1, 2,
     'Expected account-list and OTP requests to use bearer authorization.');
 
-  for (const [relativePath, content] of [[servicePath, originalService], [helperPath, originalHelper], [rsbuildPath, originalRsbuild], [appPath, originalApp], [proposalPath, originalProposal]]) {
+  for (const [relativePath, content] of [[servicePath, originalService], [helperPath, originalHelper], [rsbuildPath, originalRsbuild], [appPath, originalApp], [proposalPath, originalProposal], [indexPath, originalIndex]]) {
     const file = path.join(tempRoot, relativePath);
     mkdirSync(path.dirname(file), { recursive: true });
     writeFileSync(file, content);
   }
 
   const runPatch = () => execFileSync(process.execPath, [patchScript, tempRoot], {
-    env: { ...process.env, NEXT_PUBLIC_DERIV_APP_ID: 'test-app-id' },
+    env: { ...process.env, NEXT_PUBLIC_DERIV_APP_ID: 'test-app-id', NEXT_PUBLIC_ASSET_PREFIX: '/tradenova/' },
     stdio: 'inherit',
   });
   runPatch();
@@ -77,6 +80,13 @@ try {
   const patchedApp = readFileSync(path.join(tempRoot, appPath), 'utf8');
   assert.ok(patchedApp.includes("process.env.NEXT_PUBLIC_ASSET_PREFIX?.replace(/\\/$/, '')"),
     'Router must use the configured GitHub Pages base path.');
+  const patchedIndex = readFileSync(path.join(tempRoot, indexPath), 'utf8');
+  assert.ok(patchedIndex.includes('<title>TradeNovaX | Automated Trading Workspace</title>'), 'Browser title must be branded TradeNovaX.');
+  assert.ok(patchedIndex.includes('<meta name="title" content="TradeNovaX | Automated Trading Workspace" />'), 'Search title must be branded TradeNovaX.');
+  assert.ok(patchedIndex.includes('<meta property="og:title" content="TradeNovaX" />'), 'Social preview title must be branded TradeNovaX.');
+  assert.ok(patchedIndex.includes('href="/tradenova/tradenova-logo.svg"'), 'GitHub Pages favicon must use the project asset prefix.');
+  const logo = readFileSync(path.join(tempRoot, 'public', 'tradenova-logo.svg'), 'utf8');
+  assert.ok(logo.includes('aria-label="TradeNovaX"') && logo.includes('#0b1830'), 'TradeNovaX favicon must be created with the product brand.');
   const patchedProposal = readFileSync(path.join(tempRoot, proposalPath), 'utf8');
   assert.ok(patchedProposal.includes('const errorDetails = error?.error ?? {};'),
     'Malformed Deriv errors must be handled without throwing a second error.');
@@ -97,6 +107,8 @@ try {
   const rsbuildOnce = patchedRsbuild;
   const appOnce = patchedApp;
   const proposalOnce = patchedProposal;
+  const indexOnce = patchedIndex;
+  const logoOnce = logo;
   runPatch();
   assert.equal(readFileSync(path.join(tempRoot, servicePath), 'utf8'), serviceOnce,
     'Header patch must be idempotent.');
@@ -106,6 +118,10 @@ try {
     'Asset-prefix patch must be idempotent.');
   assert.equal(readFileSync(path.join(tempRoot, appPath), 'utf8'), appOnce,
     'Router-base patch must be idempotent.');
+  assert.equal(readFileSync(path.join(tempRoot, indexPath), 'utf8'), indexOnce,
+    'Branding patch must be idempotent.');
+  assert.equal(readFileSync(path.join(tempRoot, 'public', 'tradenova-logo.svg'), 'utf8'), logoOnce,
+    'Favicon generation must be idempotent.');
   assert.equal(readFileSync(path.join(tempRoot, proposalPath), 'utf8'), proposalOnce,
     'Proposal readiness patch must be idempotent.');
   console.log('Deriv API header, circular-error, and proposal-readiness regression tests passed.');
