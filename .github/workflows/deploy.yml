@@ -25,6 +25,7 @@ jobs:
           node scripts/test-github-bot-patches.mjs
           node scripts/test-remove-deriv-mode-banner.mjs
           node scripts/test-publish-tradenova-workspace.mjs
+          node scripts/test-session-persistence.mjs
       - name: Build the uploaded ZIP application
         env:
           NEXT_PUBLIC_DERIV_APP_ID: 34g3dK2hXuNSYEMsOUlvT
