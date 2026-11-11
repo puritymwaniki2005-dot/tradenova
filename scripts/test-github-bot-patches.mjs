@@ -84,7 +84,7 @@ try {
   assert.ok(patchedIndex.includes('<title>TradeNovaX | Automated Trading Workspace</title>'), 'Browser title must be branded TradeNovaX.');
   assert.ok(patchedIndex.includes('<meta name="title" content="TradeNovaX | Automated Trading Workspace" />'), 'Search title must be branded TradeNovaX.');
   assert.ok(patchedIndex.includes('<meta property="og:title" content="TradeNovaX" />'), 'Social preview title must be branded TradeNovaX.');
-  assert.ok(patchedIndex.includes('href="/tradenova/tradenova-logo.svg"'), 'GitHub Pages favicon must use the project asset prefix.');
+  assert.ok(patchedIndex.includes('href="/tradenova-logo.svg"'), 'Source favicon must use the branded public asset; Rsbuild applies the deployment prefix.');
   const logo = readFileSync(path.join(tempRoot, 'public', 'tradenova-logo.svg'), 'utf8');
   assert.ok(logo.includes('aria-label="TradeNovaX"') && logo.includes('#0b1830'), 'TradeNovaX favicon must be created with the product brand.');
   const patchedProposal = readFileSync(path.join(tempRoot, proposalPath), 'utf8');
