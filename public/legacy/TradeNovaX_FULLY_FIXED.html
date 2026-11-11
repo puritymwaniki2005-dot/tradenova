@@ -2237,7 +2237,7 @@ function tnxStartSessionMonitor(){
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')tnxTouchSession()});
   window.addEventListener('focus',tnxTouchSession);
   window.addEventListener('storage',event=>{
-    if((event.key===TNX_SESSION_ACTIVITY_KEY||event.key==='deriv_access_token')&&event.newValue===null&&!tnxHasStoredAuth()){
+    if(event.key==='deriv_access_token'&&event.newValue===null){
       tnxEndSession('You have been signed out in another tab. Please sign in again.');
     }
   });
@@ -2246,7 +2246,7 @@ function tnxStartSessionMonitor(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',tnxStartSessionMonitor,{once:true});
 else tnxStartSessionMonitor();
 
-function readTokenFromStore(store){try{const token=store.getItem('deriv_access_token');let raw=Number(store.getItem('deriv_token_expiry')||0);if(raw&&raw<100000000000)raw*=1000;if(token&&(!raw||Date.now()<raw))return token;}catch{}return null}
+function readTokenFromStore(store){try{const token=store.getItem('deriv_access_token');let raw=Number(store.getItem('deriv_token_expiry')||0);if(raw&&raw<100000000000)raw*=1000;if(token&&(!raw||Date.now()<raw))return token;if(token&&raw&&Date.now()>=raw){store.removeItem('deriv_access_token');store.removeItem('deriv_token_expiry');}}catch{}return null}
 function getAccessToken(){if(!tnxSessionIsValid())return null;for(const store of [sessionStorage,localStorage]){const token=readTokenFromStore(store);if(token)return token;}try{const raw=localStorage.getItem('deriv_tokens_backup')||sessionStorage.getItem('deriv_tokens_backup');if(raw){const data=JSON.parse(raw);const exp=Number(data?.expires_at||data?.expiry||0);const expiresAt=exp?(exp<100000000000?exp*1000:exp):(data?.expires_in?Date.now()+Number(data.expires_in)*1000:0);if(data?.access_token&&(!expiresAt||expiresAt>Date.now()))return data.access_token;}}catch{}return null}
 function apiHeaders(){const token=derivToken||getAccessToken();if(!token)throw new Error('No valid Deriv OAuth session. Sign in with Deriv again.');return {'Authorization':`Bearer ${token}`,'Accept':'application/json','Content-Type':'application/json'}}
 async function derivFetch(path,options={}){let res;try{res=await fetch(DERIV_API+path,{...options,headers:{...apiHeaders(),...(options.headers||{})}})}catch(err){throw new Error(`Network error reaching Deriv (${err?.message||'request failed'}). Check HTTPS/network access and try again.`)}let data={};try{data=await res.json()}catch{}if(!res.ok){const e=data?.errors?.[0]||{};const detail=e.message||data?.message||`HTTP ${res.status}`;throw new Error(`Deriv ${res.status} ${e.code?`[${e.code}] `:''}${detail}`)}return data}
