@@ -28,6 +28,8 @@ try {
   assert.ok(workspaceHtml.includes("window.location.href='/tradenova/workspace/'"), 'Workspace home redirects must preserve the workspace route.');
   assert.ok(workspaceHtml.includes('Manual Trader · Bulk Trader'), 'Workspace publishing must preserve the source modules.');
   assert.ok(workspaceHtml.includes('id="tnx-visual-builder-switch"'), 'Workspace must expose the visual builder launcher.');
+  assert.ok(workspaceHtml.includes('id="tnx-reference-workspace-theme"'), 'Workspace must include the responsive reference-inspired theme.');
+  assert.ok(workspaceHtml.includes('--navy:#65070d') && workspaceHtml.includes('.tnx-ref-tabs'), 'Workspace theme must retain the red terminal palette and mobile strategy tabs.');
 
   const rootOnce = rootHtml;
   const workspaceOnce = workspaceHtml;
