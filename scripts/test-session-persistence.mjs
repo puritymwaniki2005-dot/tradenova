@@ -20,6 +20,6 @@ assert.match(legacy, /function executeManualTrade\(direction\)/, 'Manual Trader 
 assert.match(legacy, /if\(!tnxCanOpenTrade\(amount,'manual'\)\)return/, 'Manual Trader must apply risk checks inside its core handler.');
 assert.match(legacy, /let manualTradeInFlight=false/, 'Manual Trader must block duplicate in-flight orders.');
 assert.doesNotMatch(legacy, /_tnxOriginalExecuteManualTrade/, 'Manual Trader must not use the recursive wrapper that caused the call-stack failure.');
-assert.match(legacy, /if\(ctx\\.manualTrade\)manualTradeInFlight=false/, 'Manual Trader must release its request lock after a response or error.');
+assert.match(legacy, /if\(ctx\.manualTrade\)manualTradeInFlight=false/, 'Manual Trader must release its request lock after a response or error.');
 
 console.log('TradeNovaX shared session persistence and inactivity policy checks passed.');
