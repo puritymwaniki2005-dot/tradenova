@@ -89,14 +89,15 @@ export default function App() {
     let ended = false;
     let lastWrite = 0;
     const hasSession = () => {
-      try { return !!(tokenRef.current || localStorage.getItem('deriv_access_token')); }
-      catch { return !!tokenRef.current; }
+      try { return !!localStorage.getItem('deriv_access_token'); }
+      catch { return false; }
     };
     const clearSession = (message) => {
       if (ended) return;
       ended = true;
       tokenRef.current = '';
       accountRef.current = null;
+      try { socketRef.current?.close(1000, 'session expired'); } catch {}
       botRef.current.running = false;
       botRef.current.pending = false;
       try {
@@ -130,9 +131,10 @@ export default function App() {
       try { localStorage.setItem(SESSION_ACTIVITY_KEY, String(now)); } catch {}
     };
     const onStorage = (event) => {
-      if ((event.key === SESSION_ACTIVITY_KEY || event.key === 'deriv_access_token') &&
-          event.newValue === null && !hasSession()) {
+      if (event.key === 'deriv_access_token' && event.newValue === null) {
         clearSession('You have been signed out in another TradeNovaX tab.');
+      } else if (event.key === SESSION_ACTIVITY_KEY && event.newValue === null && !hasSession()) {
+        clearSession('Your TradeNovaX session has ended. Please sign in again.');
       }
     };
     checkSession();
