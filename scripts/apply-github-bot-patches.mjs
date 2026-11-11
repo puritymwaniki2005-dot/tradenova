@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 const appRoot = process.argv[2];
@@ -175,3 +175,18 @@ replaceExactlyOnce(
   "const routerBasename = isPreviewMode() ? PREVIEW_BASE_PATH : (process.env.NEXT_PUBLIC_ASSET_PREFIX?.replace(/\\/$/, '') || undefined);",
   'GitHub Pages router base path'
 );
+
+// Give the production build its own TradeNovaX identity without changing
+// Deriv API references or educational content shipped with the bot builder.
+const htmlFile = path.join(appRoot, 'index.html');
+replaceExactlyOnce(htmlFile, '<title>Automate Your Trades | Deriv Bot</title>', '<title>TradeNovaX | Automated Trading Workspace</title>', 'TradeNovaX browser title');
+replaceExactlyOnce(htmlFile, '<meta name="title" content="Automate Your Trades | Deriv Bot" />', '<meta name="title" content="TradeNovaX | Automated Trading Workspace" />', 'TradeNovaX search title');
+replaceExactlyOnce(htmlFile, '<meta property="og:title" content="Deriv Bot" />', '<meta property="og:title" content="TradeNovaX" />', 'TradeNovaX social preview title');
+const configuredPrefix = process.env.NEXT_PUBLIC_ASSET_PREFIX || '/';
+const normalizedPrefix = configuredPrefix.endsWith('/') ? configuredPrefix : configuredPrefix + '/';
+replaceExactlyOnce(htmlFile, '<link rel="icon" type="image/svg+xml" href="/tradenova/deriv-logo.svg" />', '<link rel="icon" type="image/svg+xml" href="' + normalizedPrefix + 'tradenova-logo.svg" />', 'TradeNovaX favicon path');
+const publicDir = path.join(appRoot, 'public');
+mkdirSync(publicDir, { recursive: true });
+const brandIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="TradeNovaX"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2d77b"/><stop offset="1" stop-color="#b28a25"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="#0b1830"/><path d="M13 17h38v8H37v23h-9V25H13z" fill="url(#g)"/><path d="M42 34h9v14h-9z" fill="#f2d77b" opacity=".92"/></svg>';
+writeFileSync(path.join(publicDir, 'tradenova-logo.svg'), brandIcon);
+console.log('Created and verified TradeNovaX browser icon.');
