@@ -30,6 +30,7 @@ try {
   assert.ok(workspaceHtml.includes('id="tnx-visual-builder-switch"'), 'Workspace must expose the visual builder launcher.');
   assert.ok(workspaceHtml.includes('id="tnx-reference-workspace-theme"'), 'Workspace must include the responsive reference-inspired theme.');
   assert.ok(workspaceHtml.includes('--navy:#65070d') && workspaceHtml.includes('.tnx-ref-tabs'), 'Workspace theme must retain the red terminal palette and mobile strategy tabs.');
+  assert.ok(workspaceHtml.includes('.tnx-builder-stage{background:#fff!important}') && workspaceHtml.includes('.tnx-builder-sidebar{background:#fff!important}'), 'Blockly workspace and toolbox must use the reference white canvas on desktop.');
 
   const rootOnce = rootHtml;
   const workspaceOnce = workspaceHtml;
