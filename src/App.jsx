@@ -1,5 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+const SESSION_IDLE_MS = 30 * 60 * 1000;
+const SESSION_ACTIVITY_KEY = 'tradenovax_session_last_activity';
+function readSavedDerivToken() {
+  try {
+    const token = localStorage.getItem('deriv_access_token') || '';
+    const raw = Number(localStorage.getItem('deriv_token_expiry') || 0);
+    const expiry = raw && raw < 100000000000 ? raw * 1000 : raw;
+    return token && (!expiry || Date.now() < expiry) ? token : '';
+  } catch { return ''; }
+}
 const APP_ID = '1089';
 const SYMBOLS = [
   { value: 'R_10', label: 'Volatility 10 Index' },
@@ -52,7 +62,7 @@ export default function App() {
   const configRef = useRef({});
   const botRef = useRef({ running: false, pending: false, count: 0, pnl: 0, lastQuote: null, lastDigit: null, openContract: null, lastSignal: null });
   const reconnectRef = useRef(null);
-  const tokenRef = useRef('');
+  const tokenRef = useRef(readSavedDerivToken());
   const ticksRef = useRef([]);
   const accountRef = useRef(null);
 
@@ -74,6 +84,71 @@ export default function App() {
     try { send({ forget_all: 'ticks' }); } catch {}
     try { send({ ticks: market, subscribe: 1 }); } catch {}
   }, [send]);
+
+  useEffect(() => {
+    let ended = false;
+    let lastWrite = 0;
+    const hasSession = () => {
+      try { return !!(tokenRef.current || localStorage.getItem('deriv_access_token')); }
+      catch { return !!tokenRef.current; }
+    };
+    const clearSession = (message) => {
+      if (ended) return;
+      ended = true;
+      tokenRef.current = '';
+      accountRef.current = null;
+      botRef.current.running = false;
+      botRef.current.pending = false;
+      try {
+        ['deriv_access_token','deriv_token_expiry','deriv_tokens_backup','tradenovax_session_last_activity','tradenovax_session_started_at'].forEach(k => localStorage.removeItem(k));
+      } catch {}
+      setAccount(null);
+      setToken('');
+      setBotState('stopped');
+      setNotice(message || 'Your session has ended. Please sign in again.');
+    };
+    const checkSession = () => {
+      if (!hasSession()) return true;
+      let last = 0;
+      try { last = Number(localStorage.getItem(SESSION_ACTIVITY_KEY) || 0); } catch {}
+      if (!last) {
+        const now = Date.now();
+        try { localStorage.setItem(SESSION_ACTIVITY_KEY, String(now)); localStorage.setItem('tradenovax_session_started_at', String(now)); } catch {}
+        return true;
+      }
+      if (!Number.isFinite(last) || Date.now() - last >= SESSION_IDLE_MS) {
+        clearSession('Your session expired after 30 minutes of inactivity. Please sign in again.');
+        return false;
+      }
+      return true;
+    };
+    const touch = () => {
+      if (!hasSession() || !checkSession() || ended) return;
+      const now = Date.now();
+      if (now - lastWrite < 10000) return;
+      lastWrite = now;
+      try { localStorage.setItem(SESSION_ACTIVITY_KEY, String(now)); } catch {}
+    };
+    const onStorage = (event) => {
+      if ((event.key === SESSION_ACTIVITY_KEY || event.key === 'deriv_access_token') &&
+          event.newValue === null && !hasSession()) {
+        clearSession('You have been signed out in another TradeNovaX tab.');
+      }
+    };
+    checkSession();
+    ['pointerdown','keydown','touchstart','scroll','click'].forEach(type => window.addEventListener(type, touch, { passive: true }));
+    window.addEventListener('focus', touch);
+    document.addEventListener('visibilitychange', touch);
+    window.addEventListener('storage', onStorage);
+    const timer = window.setInterval(checkSession, 15000);
+    return () => {
+      ['pointerdown','keydown','touchstart','scroll','click'].forEach(type => window.removeEventListener(type, touch));
+      window.removeEventListener('focus', touch);
+      document.removeEventListener('visibilitychange', touch);
+      window.removeEventListener('storage', onStorage);
+      window.clearInterval(timer);
+    };
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -98,7 +173,7 @@ export default function App() {
           const message = data.error.message || 'Deriv API request failed';
           addLog(message, 'error');
           if (data.msg_type === 'authorize' || data.error.code === 'InvalidToken') {
-            setAccount(null); accountRef.current = null; setNotice('Authorization failed. Check your token and API permissions.');
+            setAccount(null); accountRef.current = null; tokenRef.current = ''; try { ['deriv_access_token','deriv_token_expiry','tradenovax_session_last_activity','tradenovax_session_started_at'].forEach(k => localStorage.removeItem(k)); } catch {} setNotice('Authorization failed. Your saved session was cleared. Sign in again.');
           }
           if (data.msg_type === 'proposal' || data.msg_type === 'buy' || data.echo_req?.proposal || data.echo_req?.buy) {
             botRef.current.pending = false;
@@ -114,6 +189,7 @@ export default function App() {
           const a = data.authorize;
           const details = { loginid: a.loginid, currency: a.currency || 'USD', balance: Number(a.balance || 0), isDemo: /^VRTC|^VRT/i.test(a.loginid || '') };
           accountRef.current = details;
+          try { localStorage.setItem('deriv_access_token', tokenRef.current); localStorage.setItem(SESSION_ACTIVITY_KEY, String(Date.now())); if (!localStorage.getItem('tradenovax_session_started_at')) localStorage.setItem('tradenovax_session_started_at', String(Date.now())); } catch (e) { addLog('Could not persist the session in this browser.', 'warn'); }
           setAccount(details);
           try { send({ balance: 1, subscribe: 1 }); } catch (e) { addLog(`Balance subscription failed: ${e.message}`, 'warn'); }
           setLiveMode(!details.isDemo);
@@ -216,6 +292,19 @@ export default function App() {
     catch (e) { setNotice(e.message); }
   };
 
+  const disconnectAccount = () => {
+    botRef.current.running = false;
+    botRef.current.pending = false;
+    setBotState('stopped');
+    tokenRef.current = '';
+    accountRef.current = null;
+    setAccount(null);
+    setToken('');
+    try { ['deriv_access_token','deriv_token_expiry','deriv_tokens_backup','tradenovax_session_last_activity','tradenovax_session_started_at','deriv_account_id','deriv_account_type','tradenovax_real_account_id','tradenovax_demo_account_id','deriv_user_email','deriv_user_name'].forEach(k => localStorage.removeItem(k)); } catch {}
+    setNotice('You have signed out. Sign in again to reconnect your Deriv account.');
+    addLog('Deriv session ended by user.', 'info');
+  };
+
   const startBot = () => {
     if (botRef.current.openContract) { setNotice(`Contract #${botRef.current.openContract} is still being monitored. The bot cannot start another run until Deriv confirms that contract is closed.`); addLog('Start blocked: an existing contract is still open or its final status is not yet confirmed.', 'warn'); return; }
     if (botRef.current.pending) { setNotice('A trade request is still pending. Wait for Deriv to confirm its result before restarting the bot.'); return; }
@@ -282,7 +371,7 @@ export default function App() {
       <header className="dbot-topbar"><div className="dbot-breadcrumb"><button className="mobile-menu" onClick={()=>document.querySelector('.dbot-sidebar')?.classList.toggle('show-mobile')}>☰</button><span>Workspace</span><b>/</b><strong>{page}</strong></div><div className="top-status"><span className={`connection-light ${connection==='connected'?'connected':''}`}/><span>{connection==='connected'?'Deriv connected':connection==='connecting'?'Connecting…':'Market feed offline'}</span><span className="top-divider"/><span className="account-mode">{account ? (account.isDemo?'DEMO ACCOUNT':'REAL ACCOUNT') : 'PUBLIC MARKET DATA'}</span></div></header>
       <div className="dbot-content">
         {notice && <div className="dbot-notice"><span>ⓘ</span><p>{notice}</p><button onClick={()=>setNotice('')}>×</button></div>}
-        {page==='Account' ? <section className="account-page panel"><div className="page-title"><div><span className="overline">ACCOUNT SETTINGS</span><h1>Connect your Deriv account</h1><p>Use a Deriv API token to authorize this browser session.</p></div></div><div className="token-panel"><label>API token</label><input type="password" value={token} onChange={e=>setToken(e.target.value)} placeholder="Paste demo API token" autoComplete="off"/><button className="btn btn-primary" onClick={authorize}>Authorize account</button><p>Token stays in this browser session and is not saved to local storage. Use a demo token with read and trade permissions to test.</p><a href="https://app.deriv.com/account/api-token" target="_blank" rel="noreferrer">Manage Deriv API tokens ↗</a>{account&&<div className="account-summary"><strong>{account.loginid}</strong><span>{money(account.balance,account.currency)} {account.currency}</span><small>{account.isDemo?'Demo account':'Real account'}</small></div>}</div></section> :
+        {page==='Account' ? <section className="account-page panel"><div className="page-title"><div><span className="overline">ACCOUNT SETTINGS</span><h1>Connect your Deriv account</h1><p>Use a Deriv API token to authorize this browser session.</p></div></div><div className="token-panel"><label>API token</label><input type="password" value={token} onChange={e=>setToken(e.target.value)} placeholder="Paste demo API token" autoComplete="off"/><button className="btn btn-primary" onClick={authorize}>Authorize account</button><p>Your successful Deriv session is remembered on this device and shared with the full workspace. It expires after 30 minutes of inactivity or when you sign out.</p>{account && <button className="btn btn-secondary" onClick={disconnectAccount}>Sign out of Deriv</button>}<a href="https://app.deriv.com/account/api-token" target="_blank" rel="noreferrer">Manage Deriv API tokens ↗</a>{account&&<div className="account-summary"><strong>{account.loginid}</strong><span>{money(account.balance,account.currency)} {account.currency}</span><small>{account.isDemo?'Demo account':'Real account'}</small></div>}</div></section> :
         page==='Trade History' ? <section className="panel data-page"><div className="page-title"><div><span className="overline">EXECUTION RECORD</span><h1>Trade history</h1><p>Contracts opened by this workspace session.</p></div></div><TradeTable trades={trades} currency={account?.currency||'USD'}/></section> :
         page==='Performance' ? <section className="panel data-page"><div className="page-title"><div><span className="overline">SESSION ANALYTICS</span><h1>Performance</h1><p>Live performance for this bot session.</p></div></div><div className="performance-cards"><Metric label="Session P/L" value={money(runningPnl,account?.currency)} tone={runningPnl>=0?'positive':'negative'}/><Metric label="Contracts bought" value={String(runCount)}/><Metric label="Closed contracts" value={String(trades.filter(t=>t.status==='Closed').length)}/></div><div className="empty-note">Statistics reflect contracts recorded by this browser session only.</div></section> :
         page==='Charts & Markets' ? <MarketPanel symbol={symbol} setSymbol={setSymbol} quote={quote} ticks={ticks} chartPath={chartPath}/> :
