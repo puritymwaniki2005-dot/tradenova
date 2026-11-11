@@ -23,16 +23,18 @@ try {
   const originalApp = execFileSync('unzip', ['-p', archive, appPath], { encoding: 'utf8' });
   const originalProposal = execFileSync('unzip', ['-p', archive, proposalPath], { encoding: 'utf8' });
   const originalIndex = execFileSync('unzip', ['-p', archive, indexPath], { encoding: 'utf8' });
+  const originalFavicon = execFileSync('unzip', ['-p', archive, 'public/deriv-logo.svg'], { encoding: 'utf8' });
   assert.ok(originalService.length > 0, 'Uploaded archive must contain the Deriv account service.');
   assert.ok(originalHelper.length > 0, 'Uploaded archive must contain the shared object helper.');
   assert.ok(originalRsbuild.length > 0, 'Uploaded archive must contain the Rsbuild config.');
   assert.ok(originalApp.length > 0, 'Uploaded archive must contain the app router.');
   assert.ok(originalProposal.length > 0, 'Uploaded archive must contain the Deriv proposal engine.');
   assert.ok(originalIndex.includes('<title>Automate Your Trades | Deriv Bot</title>'), 'Uploaded app must contain the expected source title before branding.');
+  assert.ok(originalFavicon.includes('<svg'), 'Uploaded app must contain its current browser icon.');
   assert.equal(originalService.split("Authorization: `Bearer ${accessToken}`,").length - 1, 2,
     'Expected account-list and OTP requests to use bearer authorization.');
 
-  for (const [relativePath, content] of [[servicePath, originalService], [helperPath, originalHelper], [rsbuildPath, originalRsbuild], [appPath, originalApp], [proposalPath, originalProposal], [indexPath, originalIndex]]) {
+  for (const [relativePath, content] of [[servicePath, originalService], [helperPath, originalHelper], [rsbuildPath, originalRsbuild], [appPath, originalApp], [proposalPath, originalProposal], [indexPath, originalIndex], ['public/deriv-logo.svg', originalFavicon]]) {
     const file = path.join(tempRoot, relativePath);
     mkdirSync(path.dirname(file), { recursive: true });
     writeFileSync(file, content);
@@ -84,8 +86,7 @@ try {
   assert.ok(patchedIndex.includes('<title>TradeNovaX | Automated Trading Workspace</title>'), 'Browser title must be branded TradeNovaX.');
   assert.ok(patchedIndex.includes('<meta name="title" content="TradeNovaX | Automated Trading Workspace" />'), 'Search title must be branded TradeNovaX.');
   assert.ok(patchedIndex.includes('<meta property="og:title" content="TradeNovaX" />'), 'Social preview title must be branded TradeNovaX.');
-  assert.ok(patchedIndex.includes('href="/tradenova-logo.svg"'), 'Source favicon must use the branded public asset; Rsbuild applies the deployment prefix.');
-  const logo = readFileSync(path.join(tempRoot, 'public', 'tradenova-logo.svg'), 'utf8');
+  const logo = readFileSync(path.join(tempRoot, 'public', 'deriv-logo.svg'), 'utf8');
   assert.ok(logo.includes('aria-label="TradeNovaX"') && logo.includes('#0b1830'), 'TradeNovaX favicon must be created with the product brand.');
   const patchedProposal = readFileSync(path.join(tempRoot, proposalPath), 'utf8');
   assert.ok(patchedProposal.includes('const errorDetails = error?.error ?? {};'),
@@ -120,7 +121,7 @@ try {
     'Router-base patch must be idempotent.');
   assert.equal(readFileSync(path.join(tempRoot, indexPath), 'utf8'), indexOnce,
     'Branding patch must be idempotent.');
-  assert.equal(readFileSync(path.join(tempRoot, 'public', 'tradenova-logo.svg'), 'utf8'), logoOnce,
+  assert.equal(readFileSync(path.join(tempRoot, 'public', 'deriv-logo.svg'), 'utf8'), logoOnce,
     'Favicon generation must be idempotent.');
   assert.equal(readFileSync(path.join(tempRoot, proposalPath), 'utf8'), proposalOnce,
     'Proposal readiness patch must be idempotent.');
