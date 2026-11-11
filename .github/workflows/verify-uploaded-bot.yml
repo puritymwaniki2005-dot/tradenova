@@ -7,6 +7,9 @@ on:
       - "scripts/build-uploaded-bot.mjs"
       - "scripts/apply-github-bot-patches.mjs"
       - "scripts/test-github-bot-patches.mjs"
+      - "scripts/publish-tradenova-workspace.mjs"
+      - "scripts/test-publish-tradenova-workspace.mjs"
+      - "public/legacy/TradeNovaX_FULLY_FIXED.html"
       - "vercel.json"
       - ".github/workflows/verify-uploaded-bot.yml"
   workflow_dispatch:
@@ -29,8 +32,11 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
 
-      - name: Test Deriv API header patch against the original uploaded source
-        run: node scripts/test-github-bot-patches.mjs
+      - name: Test production patches and workspace publishing
+        run: |
+          node scripts/test-github-bot-patches.mjs
+          node scripts/test-remove-deriv-mode-banner.mjs
+          node scripts/test-publish-tradenova-workspace.mjs
 
       - name: Build the exact uploaded bot using the shared deployment script
         env:
