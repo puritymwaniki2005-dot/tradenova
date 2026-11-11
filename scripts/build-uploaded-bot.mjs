@@ -92,4 +92,14 @@ if (!existsSync(path.join(output, 'index.html')) || !statSync(path.join(output, 
   throw new Error('Build completed without producing dist/index.html.');
 }
 
+execFileSync('node', [
+  path.join(root, 'scripts', 'publish-tradenova-workspace.mjs'),
+  output,
+  path.join(root, 'public', 'legacy', 'TradeNovaX_FULLY_FIXED.html'),
+], { env, stdio: 'inherit' });
+
+if (!existsSync(path.join(output, 'workspace', 'index.html'))) {
+  throw new Error('Build did not publish the complete TradeNovaX workspace.');
+}
+
 console.log('Build verified. Output directory:', path.relative(root, output));
