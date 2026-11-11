@@ -184,7 +184,7 @@ replaceExactlyOnce(htmlFile, '<meta name="title" content="Automate Your Trades |
 replaceExactlyOnce(htmlFile, '<meta property="og:title" content="Deriv Bot" />', '<meta property="og:title" content="TradeNovaX" />', 'TradeNovaX social preview title');
 const configuredPrefix = process.env.NEXT_PUBLIC_ASSET_PREFIX || '/';
 const normalizedPrefix = configuredPrefix.endsWith('/') ? configuredPrefix : configuredPrefix + '/';
-replaceExactlyOnce(htmlFile, '<link rel="icon" type="image/svg+xml" href="/tradenova/deriv-logo.svg" />', '<link rel="icon" type="image/svg+xml" href="' + normalizedPrefix + 'tradenova-logo.svg" />', 'TradeNovaX favicon path');
+replaceExactlyOnce(htmlFile, '<link rel="icon" type="image/svg+xml" href="/deriv-logo.svg" />', '<link rel="icon" type="image/svg+xml" href="/tradenova-logo.svg" />', 'TradeNovaX favicon path');
 const publicDir = path.join(appRoot, 'public');
 mkdirSync(publicDir, { recursive: true });
 const brandIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="TradeNovaX"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2d77b"/><stop offset="1" stop-color="#b28a25"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="#0b1830"/><path d="M13 17h38v8H37v23h-9V25H13z" fill="url(#g)"/><path d="M42 34h9v14h-9z" fill="#f2d77b" opacity=".92"/></svg>';
