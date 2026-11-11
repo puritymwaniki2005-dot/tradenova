@@ -2233,7 +2233,7 @@ function tnxStartSessionMonitor(){
   if(tnxSessionMonitorStarted)return;
   tnxSessionMonitorStarted=true;
   if(tnxHasStoredAuth())tnxSessionIsValid();
-  ['pointerdown','keydown','touchstart','scroll','click'].forEach(type=>document.addEventListener(type,tnxTouchSession,{passive:true}));
+  ['pointerdown','keydown','touchstart','scroll','click','mousemove'].forEach(type=>document.addEventListener(type,tnxTouchSession,{passive:true}));
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')tnxTouchSession()});
   window.addEventListener('focus',tnxTouchSession);
   window.addEventListener('storage',event=>{
