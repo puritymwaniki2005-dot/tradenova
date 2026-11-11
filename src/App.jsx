@@ -138,13 +138,13 @@ export default function App() {
       }
     };
     checkSession();
-    ['pointerdown','keydown','touchstart','scroll','click'].forEach(type => window.addEventListener(type, touch, { passive: true }));
+    ['pointerdown','keydown','touchstart','scroll','click','mousemove'].forEach(type => window.addEventListener(type, touch, { passive: true }));
     window.addEventListener('focus', touch);
     document.addEventListener('visibilitychange', touch);
     window.addEventListener('storage', onStorage);
     const timer = window.setInterval(checkSession, 15000);
     return () => {
-      ['pointerdown','keydown','touchstart','scroll','click'].forEach(type => window.removeEventListener(type, touch));
+      ['pointerdown','keydown','touchstart','scroll','click','mousemove'].forEach(type => window.removeEventListener(type, touch));
       window.removeEventListener('focus', touch);
       document.removeEventListener('visibilitychange', touch);
       window.removeEventListener('storage', onStorage);
